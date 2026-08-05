@@ -12,7 +12,7 @@ export function AvailabilityCTA() {
             <p>{siteContent.contact.description}</p>
           </div>
           <div className="availability__action">
-            <a className="button button--light" href="#contacto" aria-label="Consultar disponibilidad, función disponible próximamente">
+            <a className="button button--light" href={siteContent.actions.availability.href}>
               {siteContent.actions.availability.label}
             </a>
             <small>{siteContent.contact.disclaimer}</small>

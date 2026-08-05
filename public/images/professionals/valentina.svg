@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img">
+  <title>Retrato provisional para Valentina</title>
+  <defs><linearGradient id="a" x1="1" y1="1" x2="0" y2="0"><stop stop-color="#778078"/><stop offset="1" stop-color="#e0d5c3"/></linearGradient></defs>
+  <rect width="640" height="760" fill="url(#a)"/><circle cx="320" cy="280" r="108" fill="#d0a990" opacity=".7"/>
+  <path d="M201 342c-3-157 49-242 119-242s122 85 119 242c-40-88-78-132-119-132s-79 44-119 132Zm-60 300c27-151 104-224 179-224s152 73 179 224" fill="#4f4b42" opacity=".72"/>
+  <path d="M446 142c-42 8-65 33-69 76 43-5 67-30 69-76Z" fill="#d8c68f" opacity=".75"/>
+  <text x="320" y="700" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="24" letter-spacing="4">FOTOGRAFÍA PROVISIONAL</text>
+</svg>
