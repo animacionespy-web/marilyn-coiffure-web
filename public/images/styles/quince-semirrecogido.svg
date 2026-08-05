@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img">
+  <title>Imagen provisional para semirrecogido con ondas</title>
+  <defs><linearGradient id="a" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#d9c9ba"/><stop offset="1" stop-color="#725e56"/></linearGradient></defs>
+  <rect width="640" height="760" fill="url(#a)"/>
+  <path d="M197 514c10-245 46-371 123-371s113 126 123 371" fill="none" stroke="#433832" stroke-width="120" opacity=".66"/>
+  <path d="M224 239c68 78 124 78 192 0M225 354c47-51 83 51 124 0s70 51 91 0M213 450c53-54 91 54 136 0s73 54 91 0" fill="none" stroke="#e5cbb4" stroke-width="14" opacity=".72"/>
+  <circle cx="410" cy="246" r="14" fill="#caa85f"/><circle cx="430" cy="270" r="9" fill="#e5cf9e"/>
+  <text x="320" y="682" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="25" letter-spacing="4">IMAGEN PROVISIONAL</text>
+</svg>

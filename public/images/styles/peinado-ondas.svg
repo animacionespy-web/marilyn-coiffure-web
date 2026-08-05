@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img">
+  <title>Imagen provisional para peinado con ondas</title>
+  <defs><linearGradient id="a"><stop stop-color="#c7b8aa"/><stop offset="1" stop-color="#61534a"/></linearGradient></defs>
+  <rect width="640" height="760" fill="url(#a)"/>
+  <path d="M183 202c54-70 92 70 138 0s89 70 137 0M182 304c54-70 92 70 138 0s89 70 137 0M182 406c54-70 92 70 138 0s89 70 137 0M182 508c54-70 92 70 138 0s89 70 137 0" fill="none" stroke="#f1dfc7" stroke-width="28" stroke-linecap="round" opacity=".58"/>
+  <circle cx="320" cy="355" r="178" fill="none" stroke="#fff" opacity=".18"/>
+  <text x="320" y="682" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="25" letter-spacing="4">IMAGEN PROVISIONAL</text>
+</svg>

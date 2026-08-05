@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img">
+  <title>Imagen provisional para hidratación capilar</title>
+  <defs><linearGradient id="a" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#718078"/><stop offset="1" stop-color="#d9cfbd"/></linearGradient></defs>
+  <rect width="640" height="760" fill="url(#a)"/>
+  <path d="M320 121c-12 88-122 149-122 264a122 122 0 0 0 244 0c0-115-110-176-122-264Z" fill="#f6f1e8" opacity=".48"/>
+  <path d="M253 401c17 42 51 62 96 48" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" opacity=".58"/>
+  <circle cx="468" cy="179" r="45" fill="none" stroke="#fff" opacity=".22"/><circle cx="177" cy="511" r="63" fill="none" stroke="#fff" opacity=".18"/>
+  <text x="320" y="682" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="25" letter-spacing="4">IMAGEN PROVISIONAL</text>
+</svg>
