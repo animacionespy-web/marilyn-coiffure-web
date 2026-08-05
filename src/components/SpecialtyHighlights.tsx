@@ -1,6 +1,8 @@
 import { siteContent } from '../data/siteContent'
+import { usePublicContent } from '../hooks/usePublicContent'
 
 export function SpecialtyHighlights() {
+  const { settings } = usePublicContent()
   return (
     <section className="specialties section" id="servicios" aria-labelledby="specialties-title">
       <div className="container">
@@ -15,9 +17,9 @@ export function SpecialtyHighlights() {
         </div>
 
         <div className="specialty-grid">
-          {siteContent.specialties.map((specialty) => (
-            <article className="specialty-card" key={specialty.number}>
-              <span className="specialty-card__number">{specialty.number}</span>
+          {(settings.specialties.length ? settings.specialties : siteContent.specialties).map((specialty, index) => (
+            <article className="specialty-card" key={`${specialty.title}-${index}`}>
+              <span className="specialty-card__number">{String(index + 1).padStart(2, '0')}</span>
               <div>
                 <h3>{specialty.title}</h3>
                 <p>{specialty.description}</p>

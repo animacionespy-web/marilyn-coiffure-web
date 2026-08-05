@@ -1,6 +1,9 @@
-import { featuredStyles } from '../data/styles'
+import { usePublicContent } from '../hooks/usePublicContent'
+import { PublicContentState } from './PublicContentState'
 
 export function StylesPreview() {
+  const { styles, loading, error, retry } = usePublicContent()
+  const featuredStyles = styles.filter((style) => style.active && style.featured).sort((a, b) => a.order - b.order)
   return (
     <section className="styles-preview section" id="estilos" aria-labelledby="styles-title">
       <div className="container">
@@ -12,7 +15,7 @@ export function StylesPreview() {
           </p>
         </div>
 
-        <div className="styles-grid">
+        {featuredStyles.length === 0 ? <PublicContentState loading={loading} error={error} empty="No hay estilos destacados publicados todavía." onRetry={retry} /> : <div className="styles-grid">
           {featuredStyles.slice(0, 3).map((style, index) => (
             <article className="style-card" key={style.id}>
               <a className="style-card__visual" href={`/estilos/${style.slug}`} aria-label={`Ver detalles de ${style.name}`}>
@@ -26,7 +29,7 @@ export function StylesPreview() {
               </div>
             </article>
           ))}
-        </div>
+        </div>}
 
         <div className="styles-preview__footer">
           <a className="button button--outline" href="/estilos">
