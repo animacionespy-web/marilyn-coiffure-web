@@ -8,7 +8,7 @@ export const siteContent = {
     { label: 'Contacto', href: '/#contacto' },
   ],
   actions: {
-    availability: { label: 'Consultar disponibilidad', href: '/#contacto' },
+    availability: { label: 'Consultar disponibilidad', href: '/consulta' },
     styles: { label: 'Ver estilos', href: '/estilos' },
   },
   hero: {
