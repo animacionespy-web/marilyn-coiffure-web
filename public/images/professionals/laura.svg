@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img">
+  <title>Retrato provisional para Laura</title>
+  <defs><linearGradient id="a" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#d8c8b2"/><stop offset="1" stop-color="#816e61"/></linearGradient></defs>
+  <rect width="640" height="760" fill="url(#a)"/><circle cx="320" cy="278" r="108" fill="#c99f87" opacity=".7"/>
+  <path d="M203 318c-4-150 48-221 117-221s121 71 117 221c-33-71-71-108-117-108s-84 37-117 108Zm-58 324c25-151 99-227 175-227s150 76 175 227" fill="#55463c" opacity=".76"/>
+  <path d="M221 176c60-76 144-69 198 7" fill="none" stroke="#d5b083" stroke-width="13" opacity=".7"/>
+  <text x="320" y="700" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="24" letter-spacing="4">FOTOGRAFÍA PROVISIONAL</text>
+</svg>

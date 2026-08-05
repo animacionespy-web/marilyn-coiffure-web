@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img">
+  <title>Retrato provisional para Sofía</title>
+  <defs><linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#eadfce"/><stop offset="1" stop-color="#92765d"/></linearGradient></defs>
+  <rect width="640" height="760" fill="url(#a)"/><circle cx="320" cy="280" r="107" fill="#d4a385" opacity=".68"/>
+  <path d="M192 353c-10-173 48-258 128-258s138 85 128 258c-47-100-84-145-128-145s-81 45-128 145Zm-52 289c28-147 105-224 180-224s152 77 180 224" fill="#654a37" opacity=".72"/>
+  <path d="M207 180c76-68 148-68 226 0" fill="none" stroke="#ddb875" stroke-width="16" opacity=".75"/>
+  <text x="320" y="700" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="24" letter-spacing="4">FOTOGRAFÍA PROVISIONAL</text>
+</svg>

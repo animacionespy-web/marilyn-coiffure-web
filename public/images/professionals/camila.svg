@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img">
+  <title>Retrato provisional para Camila</title>
+  <defs><linearGradient id="a" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#6e625c"/><stop offset="1" stop-color="#ded1c3"/></linearGradient></defs>
+  <rect width="640" height="760" fill="url(#a)"/><circle cx="320" cy="278" r="106" fill="#d5aa91" opacity=".72"/>
+  <circle cx="320" cy="135" r="86" fill="#342d29" opacity=".78"/><path d="M202 334c3-153 51-232 118-232s115 79 118 232c-43-82-77-119-118-119s-75 37-118 119Zm-61 308c29-155 102-226 179-226s150 71 179 226" fill="#3e3531" opacity=".73"/>
+  <circle cx="411" cy="159" r="17" fill="#c7a464"/><text x="320" y="700" text-anchor="middle" fill="#fff" font-family="Georgia,serif" font-size="24" letter-spacing="4">FOTOGRAFÍA PROVISIONAL</text>
+</svg>
