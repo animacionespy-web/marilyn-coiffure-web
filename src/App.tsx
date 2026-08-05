@@ -6,7 +6,8 @@ import { Hero } from './components/Hero'
 import { SpecialtyHighlights } from './components/SpecialtyHighlights'
 import { StylesPreview } from './components/StylesPreview'
 import { CatalogPage } from './pages/CatalogPage'
-import { ProfessionalsPlaceholderPage } from './pages/ProfessionalsPlaceholderPage'
+import { ConsultationPage } from './pages/ConsultationPage'
+import { ProfessionalsPage } from './pages/ProfessionalsPage'
 import { StyleDetailPage } from './pages/StyleDetailPage'
 
 function HomePage() {
@@ -37,7 +38,11 @@ function CurrentPage() {
   }
 
   if (path === '/profesionales') {
-    return <ProfessionalsPlaceholderPage />
+    return <ProfessionalsPage />
+  }
+
+  if (path === '/consulta' || path === '/disponibilidad') {
+    return <ConsultationPage />
   }
 
   return <HomePage />
