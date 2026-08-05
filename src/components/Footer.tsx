@@ -27,7 +27,7 @@ export function Footer() {
           <div className="site-footer__column">
             <h2>Contacto</h2>
             <p>{siteContent.contact.provisional}</p>
-            <a href="/#contacto">Consultar disponibilidad</a>
+            <a href="/consulta">Consultar disponibilidad</a>
           </div>
 
           <div className="site-footer__column">
