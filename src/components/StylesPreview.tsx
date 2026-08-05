@@ -1,4 +1,4 @@
-import { siteContent } from '../data/siteContent'
+import { featuredStyles } from '../data/styles'
 
 export function StylesPreview() {
   return (
@@ -13,25 +13,26 @@ export function StylesPreview() {
         </div>
 
         <div className="styles-grid">
-          {siteContent.styles.map((style, index) => (
-            <article className="style-card" key={style.category}>
-              <div className={`style-card__visual ${style.visualClass}`} aria-hidden="true">
-                <span>0{index + 1}</span>
-              </div>
+          {featuredStyles.slice(0, 3).map((style, index) => (
+            <article className="style-card" key={style.id}>
+              <a className="style-card__visual" href={`/estilos/${style.slug}`} aria-label={`Ver detalles de ${style.name}`}>
+                <img src={style.image} alt={style.imageAlt} loading="lazy" width="640" height="760" />
+                <span aria-hidden="true">0{index + 1}</span>
+              </a>
               <div className="style-card__body">
                 <p>{style.category}</p>
-                <h3>{style.title}</h3>
-                <span>{style.description}</span>
+                <h3><a href={`/estilos/${style.slug}`}>{style.name}</a></h3>
+                <span>{style.shortDescription}</span>
               </div>
             </article>
           ))}
         </div>
 
         <div className="styles-preview__footer">
-          <a className="button button--outline" href="#estilos" aria-label="Ver todos los estilos próximamente">
+          <a className="button button--outline" href="/estilos">
             Ver todos los estilos
           </a>
-          <span>Catálogo completo disponible en la próxima etapa</span>
+          <span>Explorá cortes, coloración, peinados y tratamientos.</span>
         </div>
       </div>
     </section>

@@ -1,15 +1,15 @@
 export const siteContent = {
   brand: 'Marilyn Coiffure',
   navigation: [
-    { label: 'Inicio', href: '#inicio' },
-    { label: 'Servicios', href: '#servicios' },
-    { label: 'Estilos', href: '#estilos' },
-    { label: 'Profesionales', href: '#salon' },
-    { label: 'Contacto', href: '#contacto' },
+    { label: 'Inicio', href: '/' },
+    { label: 'Servicios', href: '/#servicios' },
+    { label: 'Estilos', href: '/estilos' },
+    { label: 'Profesionales', href: '/profesionales' },
+    { label: 'Contacto', href: '/#contacto' },
   ],
   actions: {
-    availability: { label: 'Consultar disponibilidad', href: '#contacto' },
-    styles: { label: 'Ver estilos', href: '#estilos' },
+    availability: { label: 'Consultar disponibilidad', href: '/#contacto' },
+    styles: { label: 'Ver estilos', href: '/estilos' },
   },
   hero: {
     eyebrow: 'Belleza · cuidado · estilo',
@@ -38,26 +38,6 @@ export const siteContent = {
       number: '04',
       title: 'Asesoría personalizada',
       description: 'Escucha, criterio y una propuesta creada para vos.',
-    },
-  ],
-  styles: [
-    {
-      category: 'Cortes',
-      title: 'Movimiento natural',
-      description: 'Formas que acompañan tus facciones y tu rutina.',
-      visualClass: 'style-card__visual--cut',
-    },
-    {
-      category: 'Coloración',
-      title: 'Luz y dimensión',
-      description: 'Matices armoniosos con terminaciones cuidadas.',
-      visualClass: 'style-card__visual--color',
-    },
-    {
-      category: 'Peinados',
-      title: 'Elegancia atemporal',
-      description: 'Texturas y recogidos para ocasiones especiales.',
-      visualClass: 'style-card__visual--style',
     },
   ],
   about: {

@@ -18,7 +18,7 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="container site-header__inner">
-        <a className="brand" href="#inicio" aria-label="Marilyn Coiffure, inicio">
+        <a className="brand" href="/" aria-label="Marilyn Coiffure, inicio">
           <span className="brand__name">{siteContent.brand}</span>
           <span className="brand__descriptor">Belleza &amp; estilo</span>
         </a>

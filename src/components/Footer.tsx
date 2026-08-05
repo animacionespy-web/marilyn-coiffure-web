@@ -6,7 +6,7 @@ export function Footer() {
       <div className="container">
         <div className="site-footer__top">
           <div className="site-footer__brand">
-            <a className="brand brand--footer" href="#inicio">
+            <a className="brand brand--footer" href="/">
               <span className="brand__name">{siteContent.brand}</span>
               <span className="brand__descriptor">Belleza &amp; estilo</span>
             </a>
@@ -27,7 +27,7 @@ export function Footer() {
           <div className="site-footer__column">
             <h2>Contacto</h2>
             <p>{siteContent.contact.provisional}</p>
-            <a href="#contacto">Consultar disponibilidad</a>
+            <a href="/#contacto">Consultar disponibilidad</a>
           </div>
 
           <div className="site-footer__column">
