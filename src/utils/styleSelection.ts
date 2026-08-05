@@ -26,3 +26,11 @@ export function getSelectedStyleId() {
     return null
   }
 }
+
+export function clearSelectedStyle() {
+  try {
+    window.sessionStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // No se necesita interrumpir la navegación si el almacenamiento está bloqueado.
+  }
+}
