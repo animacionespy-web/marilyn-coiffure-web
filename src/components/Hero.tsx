@@ -1,14 +1,16 @@
 import { siteContent } from '../data/siteContent'
+import { usePublicContent } from '../hooks/usePublicContent'
 
 export function Hero() {
+  const { settings } = usePublicContent()
   return (
     <section className="hero" id="inicio" aria-labelledby="hero-title">
       <div className="hero__ornament" aria-hidden="true" />
       <div className="container hero__grid">
         <div className="hero__content">
           <p className="eyebrow">{siteContent.hero.eyebrow}</p>
-          <h1 id="hero-title">{siteContent.hero.title}</h1>
-          <p className="hero__description">{siteContent.hero.description}</p>
+          <h1 id="hero-title">{settings.heroTitle}</h1>
+          <p className="hero__description">{settings.heroDescription}</p>
           <div className="hero__actions">
             <a className="button button--dark" href={siteContent.actions.availability.href}>
               {siteContent.actions.availability.label}
@@ -26,13 +28,13 @@ export function Hero() {
 
         <div className="hero__visual" aria-label={siteContent.hero.imagePlaceholder}>
           <div className="hero__frame">
-            <div className="hero__placeholder" role="img" aria-label={siteContent.hero.imagePlaceholder}>
+            {settings.heroImageUrl ? <img className="hero__photo" src={settings.heroImageUrl} alt="Presentación de Marilyn Coiffure" /> : <div className="hero__placeholder" role="img" aria-label={siteContent.hero.imagePlaceholder}>
               <span className="hero__placeholder-mark">M</span>
               <span className="hero__placeholder-copy">
                 Fotografía
                 <small>próximamente</small>
               </span>
-            </div>
+            </div>}
           </div>
           <div className="hero__note">
             <span>Fotografía oficial</span>

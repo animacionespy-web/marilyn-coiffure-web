@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { AboutSection } from './components/AboutSection'
 import { AvailabilityCTA } from './components/AvailabilityCTA'
 import { Footer } from './components/Footer'
@@ -9,8 +10,15 @@ import { CatalogPage } from './pages/CatalogPage'
 import { ConsultationPage } from './pages/ConsultationPage'
 import { ProfessionalsPage } from './pages/ProfessionalsPage'
 import { StyleDetailPage } from './pages/StyleDetailPage'
+import { PublicContentProvider } from './hooks/usePublicContent'
+import { usePublicContent } from './hooks/usePublicContent'
+import { useDocumentMeta } from './hooks/useDocumentMeta'
+
+const AdminApp = lazy(() => import('./admin/AdminApp').then((module) => ({ default: module.AdminApp })))
 
 function HomePage() {
+  const { settings } = usePublicContent()
+  useDocumentMeta(settings.seoTitle, settings.seoDescription)
   return (
     <main id="contenido-principal">
       <Hero />
@@ -49,14 +57,16 @@ function CurrentPage() {
 }
 
 export function App() {
+  if (window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/')) {
+    return <Suspense fallback={<main className="admin-auth-loading" role="status">Cargando panel administrativo…</main>}><AdminApp /></Suspense>
+  }
+
   return (
-    <>
-      <a className="skip-link" href="#contenido-principal">
-        Ir al contenido principal
-      </a>
+    <PublicContentProvider>
+      <a className="skip-link" href="#contenido-principal">Ir al contenido principal</a>
       <Header />
       <CurrentPage />
       <Footer />
-    </>
+    </PublicContentProvider>
   )
 }

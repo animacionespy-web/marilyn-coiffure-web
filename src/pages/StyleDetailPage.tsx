@@ -1,5 +1,6 @@
 import { StyleDetail } from '../components/catalog/StyleDetail'
-import { findStyleBySlug } from '../data/styles'
+import { PublicContentState } from '../components/PublicContentState'
+import { usePublicContent } from '../hooks/usePublicContent'
 import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import type { Style } from '../types/style'
 import { saveSelectedStyle } from '../utils/styleSelection'
@@ -9,7 +10,8 @@ interface StyleDetailPageProps {
 }
 
 export function StyleDetailPage({ slug }: StyleDetailPageProps) {
-  const style = findStyleBySlug(slug)
+  const { styles, loading, error, retry } = usePublicContent()
+  const style = styles.find((item) => item.slug === slug)
 
   useDocumentMeta(
     style ? `${style.name} | Marilyn Coiffure` : 'Estilo no encontrado | Marilyn Coiffure',
@@ -19,6 +21,10 @@ export function StyleDetailPage({ slug }: StyleDetailPageProps) {
   const selectStyle = (selectedStyle: Style) => {
     saveSelectedStyle(selectedStyle)
     window.location.assign(`/estilos?seleccion=${selectedStyle.slug}`)
+  }
+
+  if (!style && (loading || error)) {
+    return <main className="style-detail-page" id="contenido-principal"><div className="container"><PublicContentState loading={loading} error={error} onRetry={retry} /></div></main>
   }
 
   if (!style) {

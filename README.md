@@ -25,3 +25,9 @@ Los estilos y profesionales usan datos centralizados en `src/data/`. Las selecci
 El número general del salón se configura en `src/config/site.ts`. Mientras esté vacío, el formulario permite revisar el mensaje pero mantiene deshabilitada la apertura de WhatsApp.
 
 Los datos de contacto, enlaces sociales, fotografías, precios y profesionales se mantienen como contenido provisional hasta recibir la información oficial del negocio.
+
+## Etapa 5
+
+El proyecto incluye un panel privado en `/admin/login`, conexión con Supabase Auth, Database y Storage, CRUD de categorías, estilos, profesionales y configuración, además de migraciones RLS y un seed idempotente.
+
+Sin variables de Supabase la web pública utiliza el contenido provisional local y el login muestra una explicación clara. Consultá `supabase/README.md` para crear el proyecto, cargar el esquema, crear la cuenta admin y probar las políticas.

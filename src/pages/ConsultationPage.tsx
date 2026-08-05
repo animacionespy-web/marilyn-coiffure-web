@@ -4,11 +4,11 @@ import { ConsultationHero } from '../components/consultation/ConsultationHero'
 import { MessagePreview } from '../components/consultation/MessagePreview'
 import { MissingWhatsappNotice } from '../components/consultation/MissingWhatsappNotice'
 import { SelectionSummary } from '../components/consultation/SelectionSummary'
-import { siteConfig } from '../config/site'
-import { findProfessionalById, findProfessionalBySlug } from '../data/professionals'
-import { findStyleById, findStyleBySlug } from '../data/styles'
+import { usePublicContent } from '../hooks/usePublicContent'
 import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import type { ConsultationFormData, ConsultationSelection } from '../types/consultation'
+import type { Professional } from '../types/professional'
+import type { Style } from '../types/style'
 import {
   buildWhatsappMessage,
   buildWhatsappUrl,
@@ -21,32 +21,33 @@ import { clearConsultationDraft, getConsultationDraft, saveConsultationDraft } f
 import { getProfessionalSelection } from '../utils/professionalSelection'
 import { getSelectedStyleId } from '../utils/styleSelection'
 
-function getConsultationSelection(): ConsultationSelection {
+function getConsultationSelection(styles: Style[], professionals: Professional[]): ConsultationSelection {
   const params = new URLSearchParams(window.location.search)
   const styleSlug = params.get('estilo')
   const professionalSlug = params.get('profesional')
   const storedStyleId = getSelectedStyleId()
   const storedProfessionalSelection = getProfessionalSelection()
   const style = styleSlug
-    ? findStyleBySlug(styleSlug)
+    ? styles.find((style) => style.slug === styleSlug)
     : storedStyleId
-      ? findStyleById(storedStyleId)
+      ? styles.find((style) => style.id === storedStyleId)
       : undefined
 
   if (professionalSlug === 'cualquiera') return { style, anyProfessional: true }
   if (professionalSlug) {
-    const professional = findProfessionalBySlug(professionalSlug)
+    const professional = professionals.find((professional) => professional.slug === professionalSlug)
     return professional ? { style, professional, anyProfessional: false } : { style, anyProfessional: true }
   }
   if (storedProfessionalSelection?.mode === 'specific' && storedProfessionalSelection.professionalId) {
-    const professional = findProfessionalById(storedProfessionalSelection.professionalId)
+    const professional = professionals.find((professional) => professional.id === storedProfessionalSelection.professionalId)
     if (professional) return { style, professional, anyProfessional: false }
   }
   return { style, anyProfessional: true }
 }
 
 export function ConsultationPage() {
-  const [selection] = useState<ConsultationSelection>(getConsultationSelection)
+  const { styles, professionals, settings } = usePublicContent()
+  const selection = useMemo(() => getConsultationSelection(styles, professionals), [professionals, styles])
   const [form, setForm] = useState<ConsultationFormData>(getConsultationDraft)
   const [statusMessage, setStatusMessage] = useState('')
   const today = getTodayIsoDate()
@@ -60,8 +61,8 @@ export function ConsultationPage() {
 
   const errors = useMemo(() => validateConsultationForm(form, today), [form, today])
   const recipient = useMemo(
-    () => resolveWhatsappRecipient(selection.professional, selection.anyProfessional, siteConfig.generalWhatsappNumber),
-    [selection],
+    () => resolveWhatsappRecipient(selection.professional, selection.anyProfessional, settings.generalWhatsappNumber),
+    [selection, settings.generalWhatsappNumber],
   )
   const message = useMemo(() => buildWhatsappMessage(form, selection), [form, selection])
   const whatsappUrl = useMemo(() => buildWhatsappUrl(recipient.number, message), [message, recipient.number])
