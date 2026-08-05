@@ -1,16 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ProfessionalFilters } from '../components/professionals/ProfessionalFilters'
 import { ProfessionalsGrid } from '../components/professionals/ProfessionalsGrid'
 import { ProfessionalsHero } from '../components/professionals/ProfessionalsHero'
 import { SelectedProfessionalSummary } from '../components/professionals/SelectedProfessionalSummary'
 import { SelectedStyleContext } from '../components/professionals/SelectedStyleContext'
-import {
-  activeProfessionals,
-  findProfessionalById,
-  findProfessionalBySlug,
-  professionalFilterSpecialties,
-} from '../data/professionals'
-import { findStyleById, findStyleBySlug } from '../data/styles'
+import { PublicContentState } from '../components/PublicContentState'
+import { professionalFilterSpecialties } from '../data/professionals'
+import { usePublicContent } from '../hooks/usePublicContent'
 import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import type { Professional, ProfessionalSpecialtyFilter } from '../types/professional'
 import type { Style } from '../types/style'
@@ -22,22 +18,6 @@ import {
 } from '../utils/professionalSelection'
 import { clearSelectedStyle, getSelectedStyleId } from '../utils/styleSelection'
 
-function getInitialStyle() {
-  const selectedSlug = new URLSearchParams(window.location.search).get('estilo')
-  if (selectedSlug) return findStyleBySlug(selectedSlug)
-
-  const storedId = getSelectedStyleId()
-  return storedId ? findStyleById(storedId) : undefined
-}
-
-function getInitialProfessional() {
-  const selectedSlug = new URLSearchParams(window.location.search).get('profesional')
-  if (selectedSlug) return findProfessionalBySlug(selectedSlug)
-
-  const storedId = getSelectedProfessionalId()
-  return storedId ? findProfessionalById(storedId) : undefined
-}
-
 function getInitialAnySelection() {
   const selectedSlug = new URLSearchParams(window.location.search).get('profesional')
   if (selectedSlug === 'cualquiera') return true
@@ -45,10 +25,21 @@ function getInitialAnySelection() {
 }
 
 export function ProfessionalsPage() {
+  const { styles, professionals, loading, error, retry } = usePublicContent()
   const [selectedFilter, setSelectedFilter] = useState<ProfessionalSpecialtyFilter>('Todas')
-  const [selectedStyle, setSelectedStyle] = useState<Style | undefined>(getInitialStyle)
-  const [selectedProfessional, setSelectedProfessional] = useState<Professional | undefined>(getInitialProfessional)
+  const [selectedStyle, setSelectedStyle] = useState<Style | undefined>()
+  const [selectedProfessional, setSelectedProfessional] = useState<Professional | undefined>()
   const [isAnyProfessionalSelected, setIsAnyProfessionalSelected] = useState(getInitialAnySelection)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const styleSlug = params.get('estilo')
+    const professionalSlug = params.get('profesional')
+    const storedStyleId = getSelectedStyleId()
+    const storedProfessionalId = getSelectedProfessionalId()
+    setSelectedStyle(styles.find((style) => style.slug === styleSlug || style.id === storedStyleId))
+    setSelectedProfessional(professionals.find((professional) => professional.slug === professionalSlug || professional.id === storedProfessionalId))
+  }, [professionals, styles])
 
   useDocumentMeta(
     'Profesionales | Marilyn Coiffure',
@@ -56,12 +47,15 @@ export function ProfessionalsPage() {
   )
 
   const filteredProfessionals = useMemo(() => {
-    if (selectedFilter === 'Todas') return activeProfessionals
-    const acceptedSpecialties = professionalFilterSpecialties[selectedFilter]
-    return activeProfessionals.filter((professional) =>
-      professional.specialties.some((specialty) => acceptedSpecialties.includes(specialty)),
+    const filtered = selectedFilter === 'Todas' ? professionals : professionals.filter((professional) => {
+      const acceptedSpecialties = professionalFilterSpecialties[selectedFilter]
+      return professional.specialties.some((specialty) => acceptedSpecialties.includes(specialty))
+    })
+    if (!selectedStyle) return filtered
+    return [...filtered].sort((first, second) =>
+      Number(Boolean(second.styleIds?.includes(selectedStyle.id))) - Number(Boolean(first.styleIds?.includes(selectedStyle.id))),
     )
-  }, [selectedFilter])
+  }, [professionals, selectedFilter, selectedStyle])
 
   const updateUrl = (professional?: Professional, style = selectedStyle, anyProfessional = false) => {
     const params = new URLSearchParams()
@@ -119,6 +113,7 @@ export function ProfessionalsPage() {
           </div>
 
           <ProfessionalFilters selectedFilter={selectedFilter} onChange={setSelectedFilter} />
+          {selectedStyle && <p className="professional-recommendation-note">Las profesionales relacionadas con “{selectedStyle.name}” aparecen primero.</p>}
           <aside className={`any-professional ${isAnyProfessionalSelected ? 'is-selected' : ''}`}>
             <div className="any-professional__mark" aria-hidden="true">✦</div>
             <div>
@@ -135,11 +130,11 @@ export function ProfessionalsPage() {
               {isAnyProfessionalSelected ? 'Opción elegida' : 'Elegir cualquiera disponible'}
             </button>
           </aside>
-          <ProfessionalsGrid
+          {filteredProfessionals.length === 0 && (loading || error || professionals.length === 0) ? <PublicContentState loading={loading} error={error} empty="No hay profesionales publicadas todavía." onRetry={retry} /> : <ProfessionalsGrid
             professionals={filteredProfessionals}
             selectedProfessionalId={selectedProfessional?.id}
             onSelect={selectProfessional}
-          />
+          />}
 
           {(selectedProfessional || isAnyProfessionalSelected) && (
             <SelectedProfessionalSummary
