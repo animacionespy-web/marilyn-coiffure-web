@@ -21,7 +21,7 @@ export function Header() {
         <a className="brand" href="/" aria-label="Marilyn Coiffure, inicio">
           <img
             className="brand__logo"
-            src="/images/brand/marilyn-coiffure-logo.png"
+            src="/images/brand/marilyn-coiffure-logo-white.png"
             alt=""
             width="706"
             height="218"

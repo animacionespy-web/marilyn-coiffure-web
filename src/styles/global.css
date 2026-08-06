@@ -3513,6 +3513,73 @@ p {
   }
 }
 
+/* Identidad del header oscuro */
+.site-header {
+  border-bottom-color: rgb(205 176 127 / 18%);
+  background: rgb(31 28 25 / 96%);
+  box-shadow: 0 10px 28px rgb(24 19 15 / 16%);
+  backdrop-filter: blur(var(--blur-medium)) saturate(115%);
+}
+
+.site-header .brand__logo {
+  filter: drop-shadow(0 8px 16px rgb(0 0 0 / 28%));
+}
+
+.site-header .brand:hover .brand__logo,
+.site-header .brand:focus-visible .brand__logo {
+  filter: drop-shadow(0 9px 18px rgb(210 177 121 / 25%));
+}
+
+.site-header__navigation {
+  border-color: rgb(205 176 127 / 16%);
+  background: rgb(35 31 28 / 98%);
+  box-shadow: 0 22px 42px rgb(16 13 11 / 24%);
+  backdrop-filter: blur(var(--blur-medium));
+}
+
+.site-header .nav-list a {
+  color: #f0e9df;
+}
+
+.site-header .nav-list a:hover,
+.site-header .nav-list a:focus-visible {
+  color: #d7b87f;
+}
+
+.site-header .header-action.button--dark {
+  border-color: rgb(255 255 255 / 28%);
+  color: #28231f;
+  background: #f6efe5;
+  box-shadow: 0 9px 22px rgb(0 0 0 / 18%);
+}
+
+.site-header .header-action.button--dark:hover,
+.site-header .header-action.button--dark:focus-visible {
+  border-color: #fffaf3;
+  color: #201c19;
+  background: #fffaf3;
+  box-shadow: 0 11px 26px rgb(0 0 0 / 24%);
+}
+
+.site-header .menu-toggle span {
+  background: #f6efe5;
+}
+
+.site-header .menu-toggle:hover,
+.site-header .menu-toggle:focus-visible {
+  border-color: rgb(215 184 127 / 48%);
+  background: rgb(255 255 255 / 6%);
+}
+
+@media (min-width: 900px) {
+  .site-header__navigation {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+}
+
 /* Corrección de jerarquía y densidad visual */
 .section {
   padding-block: clamp(58px, 6vw, 78px);
