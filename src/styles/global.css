@@ -3522,12 +3522,12 @@ p {
 }
 
 .site-header .brand__logo {
-  filter: drop-shadow(0 8px 16px rgb(0 0 0 / 28%));
+  filter: none;
 }
 
 .site-header .brand:hover .brand__logo,
 .site-header .brand:focus-visible .brand__logo {
-  filter: drop-shadow(0 9px 18px rgb(210 177 121 / 25%));
+  filter: none;
 }
 
 .site-header__navigation {
