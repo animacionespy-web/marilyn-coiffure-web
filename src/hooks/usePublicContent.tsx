@@ -38,6 +38,7 @@ export function PublicContentProvider({ children }: { children: ReactNode }) {
   const value = useMemo<PublicContentState>(() => ({
     styles: content?.styles ?? [],
     professionals: content?.professionals ?? [],
+    products: content?.products ?? [],
     categories: content?.categories ?? [],
     settings: content?.settings ?? fallbackSiteSettings,
     source: content?.source ?? 'fallback',

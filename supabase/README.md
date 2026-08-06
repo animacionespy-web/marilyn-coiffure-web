@@ -22,6 +22,8 @@ Abrí **SQL Editor**, copiá y ejecutá `migrations/202608050001_initial_schema.
 
 La migración también crea el bucket público `site-images`, limita cada archivo a 5 MB y acepta JPG, PNG y WEBP.
 
+Después de la migración inicial, ejecutá manualmente `migrations/202608060001_add_products.sql` para habilitar la administración de Productos. Esta migración es adicional, no destructiva y no se ejecuta automáticamente en producción.
+
 ## 4. Cargar los datos iniciales
 
 Ejecutá `seed.sql` desde SQL Editor. Usa UUID conocidos, `upsert` y `on conflict`, por lo que puede repetirse sin duplicar registros. Los textos, nombres e imágenes son provisionales. No carga números inventados.
@@ -46,7 +48,9 @@ No hay registro público. Una cuenta autenticada sin `profiles.role = 'admin'` n
 
 ## 6. Verificar Storage
 
-En **Storage** debe aparecer `site-images`. Las carpetas `styles/`, `professionals/` y `home/` se crean al subir contenido. La lectura es pública; INSERT, UPDATE y DELETE requieren `public.is_admin()`.
+En **Storage** debe aparecer `site-images`. Las carpetas `styles/`, `professionals/`, `products/` y `home/` se crean al subir contenido. La lectura es pública; INSERT, UPDATE y DELETE requieren `public.is_admin()`.
+
+Una vez aplicada la migración de Productos, ingresá a `/admin/productos` para crear, editar, ordenar, destacar y publicar artículos. Hasta entonces, la página pública usa el catálogo provisional centralizado sin bloquear el resto del sitio.
 
 ## 7. Verificar RLS
 

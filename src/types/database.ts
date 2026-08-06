@@ -45,6 +45,22 @@ export interface DatabaseProfessionalRow {
   instagram_url: string | null
 }
 
+export interface DatabaseProductRow {
+  id: string
+  name: string
+  slug: string
+  category: string | null
+  short_description: string | null
+  full_description: string | null
+  image_url: string | null
+  image_path: string | null
+  featured: boolean
+  active: boolean
+  display_order: number
+  price: number | null
+  stock_status: string | null
+}
+
 export interface DatabaseSettingRow {
   id: string
   key: string

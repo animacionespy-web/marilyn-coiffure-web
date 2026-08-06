@@ -5,11 +5,13 @@ import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { Hero } from './components/Hero'
 import { ProfessionalsPreview } from './components/ProfessionalsPreview'
+import { ProductsPreview } from './components/ProductsPreview'
 import { SpecialtyHighlights } from './components/SpecialtyHighlights'
 import { StylesPreview } from './components/StylesPreview'
 import { CatalogPage } from './pages/CatalogPage'
 import { ConsultationPage } from './pages/ConsultationPage'
 import { ProfessionalsPage } from './pages/ProfessionalsPage'
+import { ProductsPage } from './pages/ProductsPage'
 import { StyleDetailPage } from './pages/StyleDetailPage'
 import { PublicContentProvider } from './hooks/usePublicContent'
 import { usePublicContent } from './hooks/usePublicContent'
@@ -23,8 +25,9 @@ function HomePage() {
   return (
     <main id="contenido-principal">
       <Hero />
-      <ProfessionalsPreview />
       <StylesPreview />
+      <ProfessionalsPreview />
+      <ProductsPreview />
       <SpecialtyHighlights />
       <AboutSection />
       <AvailabilityCTA />
@@ -49,6 +52,10 @@ function CurrentPage() {
 
   if (path === '/profesionales') {
     return <ProfessionalsPage />
+  }
+
+  if (path === '/productos') {
+    return <ProductsPage />
   }
 
   if (path === '/consulta' || path === '/disponibilidad') {

@@ -2,15 +2,17 @@ import type { Style } from '../../types/style'
 
 interface StyleCardProps {
   style: Style
+  isSelected: boolean
+  isRecommended: boolean
   onSelect: (style: Style) => void
 }
 
-export function StyleCard({ style, onSelect }: StyleCardProps) {
+export function StyleCard({ style, isSelected, isRecommended, onSelect }: StyleCardProps) {
   return (
-    <article className="catalog-card">
+    <article className={`catalog-card ${isSelected ? 'is-selected' : ''}`}>
       <a className="catalog-card__image" href={`/estilos/${style.slug}`} aria-label={`Ver detalles de ${style.name}`}>
         <img src={style.image} alt={style.imageAlt} loading="lazy" width="640" height="760" />
-        <span>{style.category}</span>
+        {isRecommended && <span>Recomendado con esta profesional</span>}
       </a>
       <div className="catalog-card__body">
         <p className="catalog-card__category">{style.category}</p>
@@ -18,7 +20,7 @@ export function StyleCard({ style, onSelect }: StyleCardProps) {
         <p>{style.shortDescription}</p>
         <div className="catalog-card__actions">
           <button className="button button--dark" type="button" onClick={() => onSelect(style)}>
-            Elegir estilo
+            {isSelected ? '✓ Seleccionado' : 'Elegir estilo'}
           </button>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { uploadSiteImage, validateImage } from '../../services/storage'
 import type { UploadResult } from '../../types/admin'
 
 export function ImageUploadField({ folder, imageUrl, label, onUploaded }: {
-  folder: 'styles' | 'professionals' | 'home'
+  folder: 'styles' | 'professionals' | 'products' | 'home'
   imageUrl: string
   label: string
   onUploaded: (result: UploadResult) => void

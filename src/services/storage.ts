@@ -11,7 +11,7 @@ export function validateImage(file: File) {
   return ''
 }
 
-export async function uploadSiteImage(file: File, folder: 'styles' | 'professionals' | 'home'): Promise<UploadResult> {
+export async function uploadSiteImage(file: File, folder: 'styles' | 'professionals' | 'products' | 'home'): Promise<UploadResult> {
   const validationError = validateImage(file)
   if (validationError) throw new Error(validationError)
   const client = requireSupabase()

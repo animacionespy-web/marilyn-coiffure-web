@@ -58,6 +58,22 @@ export interface AdminProfessional {
   styleIds: string[]
 }
 
+export interface AdminProduct {
+  id: string
+  name: string
+  slug: string
+  category: string
+  shortDescription: string
+  fullDescription: string
+  imageUrl: string
+  imagePath: string
+  featured: boolean
+  active: boolean
+  displayOrder: number
+  price: number | null
+  stockStatus: string
+}
+
 export interface SiteSettings {
   salonName: string
   generalWhatsappNumber: string

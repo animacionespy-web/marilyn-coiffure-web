@@ -6,6 +6,7 @@ const navigation = [
   { label: 'Estilos', href: '/admin/estilos', icon: '✦' },
   { label: 'Categorías', href: '/admin/categorias', icon: '◫' },
   { label: 'Profesionales', href: '/admin/profesionales', icon: '◇' },
+  { label: 'Productos', href: '/admin/productos', icon: '▣' },
   { label: 'Contenido del sitio', href: '/admin/contenido', icon: '¶' },
   { label: 'Configuración', href: '/admin/configuracion', icon: '⚙' },
 ]

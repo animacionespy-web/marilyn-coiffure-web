@@ -7,6 +7,7 @@ import { AdminContentPage } from './pages/AdminContentPage'
 import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminLoginPage } from './pages/AdminLoginPage'
 import { AdminProfessionalsPage } from './pages/AdminProfessionalsPage'
+import { AdminProductsPage } from './pages/AdminProductsPage'
 import { AdminSettingsPage } from './pages/AdminSettingsPage'
 import { AdminStylesPage } from './pages/AdminStylesPage'
 
@@ -33,6 +34,7 @@ function AdminRoutes() {
   if (path === '/admin/estilos') page = <AdminStylesPage />
   else if (path === '/admin/categorias') page = <AdminCategoriesPage />
   else if (path === '/admin/profesionales') page = <AdminProfessionalsPage />
+  else if (path === '/admin/productos') page = <AdminProductsPage />
   else if (path === '/admin/contenido') page = <AdminContentPage />
   else if (path === '/admin/configuracion') page = <AdminSettingsPage />
   return <ProtectedAdmin>{page}</ProtectedAdmin>

@@ -1,12 +1,15 @@
 import { siteConfig } from '../config/site'
 import { professionals as fallbackProfessionals } from '../data/professionals'
+import { products as fallbackProducts } from '../data/products'
 import { siteContent } from '../data/siteContent'
 import { styles as fallbackStyles } from '../data/styles'
 import { requireSupabase, supabaseConfiguration } from '../lib/supabase'
 import type { Professional, ProfessionalSpecialty } from '../types/professional'
+import type { Product, ProductCategory } from '../types/product'
 import type { Style, StyleCategory } from '../types/style'
 import type {
   AdminProfessional,
+  AdminProduct,
   AdminStyle,
   Category,
   DashboardSummary,
@@ -15,6 +18,7 @@ import type {
 import type {
   DatabaseCategoryRow,
   DatabaseProfessionalRow,
+  DatabaseProductRow,
   DatabaseSettingRow,
   DatabaseStyleRow,
 } from '../types/database'
@@ -102,6 +106,24 @@ function mapAdminProfessional(row: DatabaseProfessionalRow, styleIds: string[]):
     availabilityNote: row.availability_note ?? '',
     instagramUrl: row.instagram_url ?? '',
     styleIds,
+  }
+}
+
+function mapAdminProduct(row: DatabaseProductRow): AdminProduct {
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    category: row.category ?? '',
+    shortDescription: row.short_description ?? '',
+    fullDescription: row.full_description ?? '',
+    imageUrl: row.image_url ?? '',
+    imagePath: row.image_path ?? '',
+    featured: row.featured,
+    active: row.active,
+    displayOrder: row.display_order,
+    price: row.price,
+    stockStatus: row.stock_status ?? '',
   }
 }
 
@@ -251,6 +273,45 @@ export const professionalsService = {
   },
 }
 
+export const productsService = {
+  async list(includeInactive = true) {
+    const client = requireSupabase()
+    let query = client.from('products').select('*').order('display_order').order('name')
+    if (!includeInactive) query = query.eq('active', true)
+    const { data, error } = await query
+    if (error) throw new Error(humanizeDataError(error, 'No pudimos cargar los productos.'))
+    return sortByOrderAndName(((data ?? []) as DatabaseProductRow[]).map(mapAdminProduct))
+  },
+  async save(product: AdminProduct) {
+    if (!Number.isInteger(product.displayOrder) || product.displayOrder < 0) throw new Error('El orden debe ser un número entero válido.')
+    if (product.price !== null && product.price < 0) throw new Error('El precio no puede ser negativo.')
+    const client = requireSupabase()
+    const payload = {
+      id: product.id || undefined,
+      name: product.name.trim(),
+      slug: product.slug.trim(),
+      category: product.category.trim() || null,
+      short_description: product.shortDescription.trim() || null,
+      full_description: product.fullDescription.trim() || null,
+      image_url: product.imageUrl || null,
+      image_path: product.imagePath || null,
+      featured: product.featured,
+      active: product.active,
+      display_order: product.displayOrder,
+      price: product.price,
+      stock_status: product.stockStatus.trim() || null,
+    }
+    const { data, error } = await client.from('products').upsert(payload).select('*').single()
+    if (error) throw new Error(humanizeDataError(error, 'No se pudo guardar el producto.'))
+    return mapAdminProduct(data as DatabaseProductRow)
+  },
+  async remove(product: AdminProduct) {
+    const client = requireSupabase()
+    const { error } = await client.from('products').delete().eq('id', product.id)
+    if (error) throw new Error(humanizeDataError(error, 'No se pudo eliminar el producto.'))
+  },
+}
+
 export const settingsService = {
   async get() {
     const client = requireSupabase()
@@ -292,6 +353,7 @@ export const dashboardService = {
 export interface PublicContent {
   styles: Style[]
   professionals: Professional[]
+  products: Product[]
   categories: Category[]
   settings: SiteSettings
   source: 'supabase' | 'fallback'
@@ -340,26 +402,47 @@ function toPublicProfessional(professional: AdminProfessional): Professional {
   }
 }
 
+function toPublicProduct(product: AdminProduct): Product {
+  return {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    category: product.category as ProductCategory,
+    shortDescription: product.shortDescription,
+    fullDescription: product.fullDescription,
+    image: product.imageUrl || '/images/products/tratamiento.svg',
+    imageAlt: `Presentación de ${product.name}`,
+    featured: product.featured,
+    active: product.active,
+    displayOrder: product.displayOrder,
+    price: product.price ?? undefined,
+    stockStatus: product.stockStatus || undefined,
+  }
+}
+
 export async function loadPublicContent(): Promise<PublicContent> {
   if (!supabaseConfiguration.configured) {
     return {
       styles: fallbackStyles.filter((item) => item.active),
       professionals: fallbackProfessionals.filter((item) => item.active),
+      products: fallbackProducts.filter((item) => item.active),
       categories: [],
       settings: fallbackSiteSettings,
       source: 'fallback',
     }
   }
-  const [categories, styles, professionals, settings] = await Promise.all([
+  const [categories, styles, professionals, settings, products] = await Promise.all([
     categoriesService.list(false),
     stylesService.list(false),
     professionalsService.list(false),
     settingsService.get(),
+    productsService.list(false).catch(() => []),
   ])
   return {
     categories,
     styles: styles.map((item) => toPublicStyle(item, categories)).filter((item): item is Style => Boolean(item)),
     professionals: professionals.map(toPublicProfessional),
+    products: products.length ? products.map(toPublicProduct) : fallbackProducts.filter((item) => item.active),
     settings,
     source: 'supabase',
   }

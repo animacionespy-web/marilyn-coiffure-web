@@ -15,7 +15,7 @@ export function Hero() {
             <a className="button button--dark" href={siteContent.actions.availability.href}>
               {siteContent.actions.availability.label}
             </a>
-            <a className="text-link" href={siteContent.actions.styles.href}>
+            <a className="button hero__styles-button" href={siteContent.actions.styles.href}>
               {siteContent.actions.styles.label}
               <span aria-hidden="true">↗</span>
             </a>

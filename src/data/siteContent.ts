@@ -5,6 +5,7 @@ export const siteContent = {
     { label: 'Servicios', href: '/#servicios' },
     { label: 'Estilos', href: '/estilos' },
     { label: 'Profesionales', href: '/profesionales' },
+    { label: 'Productos', href: '/productos' },
     { label: 'Contacto', href: '/#contacto' },
   ],
   actions: {
