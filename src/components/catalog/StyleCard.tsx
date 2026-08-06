@@ -14,17 +14,9 @@ export function StyleCard({ style, onSelect }: StyleCardProps) {
       </a>
       <div className="catalog-card__body">
         <p className="catalog-card__category">{style.category}</p>
-        <h2>{style.name}</h2>
+        <h2><a href={`/estilos/${style.slug}`}>{style.name}</a></h2>
         <p>{style.shortDescription}</p>
-        <ul className="style-tags" aria-label={`Etiquetas de ${style.name}`}>
-          {style.tags.slice(0, 3).map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-        </ul>
         <div className="catalog-card__actions">
-          <a className="button button--outline" href={`/estilos/${style.slug}`}>
-            Ver detalles
-          </a>
           <button className="button button--dark" type="button" onClick={() => onSelect(style)}>
             Elegir estilo
           </button>

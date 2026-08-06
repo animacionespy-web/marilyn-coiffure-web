@@ -7,15 +7,10 @@ export function ProfessionalsHero() {
             <span aria-hidden="true">←</span> Volver al inicio
           </a>
           <p className="eyebrow">Nuestro equipo</p>
-          <h1 id="professionals-title">Elegí la profesional ideal para vos</h1>
+          <h1 id="professionals-title">Elegí tu profesional</h1>
         </div>
         <div className="professionals-hero__copy">
-          <p>
-            Conocé a nuestras especialistas y seleccioná la profesional con la que querés consultar disponibilidad.
-          </p>
-          <small>
-            La elección de una profesional no confirma el turno. La disponibilidad será consultada por WhatsApp.
-          </small>
+          <p>Conocé a nuestras especialistas y consultá disponibilidad.</p>
         </div>
       </div>
     </section>

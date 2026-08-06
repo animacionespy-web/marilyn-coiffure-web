@@ -12,9 +12,15 @@ export function Footer() {
       <div className="container">
         <div className="site-footer__top">
           <div className="site-footer__brand">
-            <a className="brand brand--footer" href="/">
-              <span className="brand__name">{settings.salonName}</span>
-              <span className="brand__descriptor">Belleza &amp; estilo</span>
+            <a className="brand brand--footer" href="/" aria-label={`${settings.salonName || siteContent.brand}, inicio`}>
+              <img
+                className="brand__logo brand__logo--footer"
+                src="/images/brand/marilyn-coiffure-logo.png"
+                alt=""
+                width="706"
+                height="218"
+                aria-hidden="true"
+              />
             </a>
             <p>Una experiencia de belleza cercana, cuidada y pensada para vos.</p>
           </div>

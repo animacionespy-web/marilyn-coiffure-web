@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ProfessionalFilters } from '../components/professionals/ProfessionalFilters'
+import { ProfessionalSearch } from '../components/professionals/ProfessionalSearch'
 import { ProfessionalsGrid } from '../components/professionals/ProfessionalsGrid'
 import { ProfessionalsHero } from '../components/professionals/ProfessionalsHero'
 import { SelectedProfessionalSummary } from '../components/professionals/SelectedProfessionalSummary'
@@ -24,9 +25,13 @@ function getInitialAnySelection() {
   return getProfessionalSelection()?.mode === 'any'
 }
 
+const normalizeText = (value: string) =>
+  value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim()
+
 export function ProfessionalsPage() {
   const { styles, professionals, loading, error, retry } = usePublicContent()
   const [selectedFilter, setSelectedFilter] = useState<ProfessionalSpecialtyFilter>('Todas')
+  const [query, setQuery] = useState('')
   const [selectedStyle, setSelectedStyle] = useState<Style | undefined>()
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | undefined>()
   const [isAnyProfessionalSelected, setIsAnyProfessionalSelected] = useState(getInitialAnySelection)
@@ -47,7 +52,16 @@ export function ProfessionalsPage() {
   )
 
   const filteredProfessionals = useMemo(() => {
-    const filtered = selectedFilter === 'Todas' ? professionals : professionals.filter((professional) => {
+    const normalizedQuery = normalizeText(query)
+    const matchingQuery = normalizedQuery
+      ? professionals.filter((professional) => normalizeText([
+        professional.name,
+        professional.role,
+        professional.shortDescription,
+        ...professional.specialties,
+      ].join(' ')).includes(normalizedQuery))
+      : professionals
+    const filtered = selectedFilter === 'Todas' ? matchingQuery : matchingQuery.filter((professional) => {
       const acceptedSpecialties = professionalFilterSpecialties[selectedFilter]
       return professional.specialties.some((specialty) => acceptedSpecialties.includes(specialty))
     })
@@ -55,7 +69,7 @@ export function ProfessionalsPage() {
     return [...filtered].sort((first, second) =>
       Number(Boolean(second.styleIds?.includes(selectedStyle.id))) - Number(Boolean(first.styleIds?.includes(selectedStyle.id))),
     )
-  }, [professionals, selectedFilter, selectedStyle])
+  }, [professionals, query, selectedFilter, selectedStyle])
 
   const updateUrl = (professional?: Professional, style = selectedStyle, anyProfessional = false) => {
     const params = new URLSearchParams()
@@ -103,8 +117,7 @@ export function ProfessionalsPage() {
 
           <div className="professionals-list-heading">
             <div>
-              <p className="eyebrow">Especialidades</p>
-              <h2 id="professionals-list-title">Conocé a cada profesional</h2>
+              <h2 id="professionals-list-title">Profesionales disponibles</h2>
             </div>
             <p aria-live="polite">
               {filteredProfessionals.length}{' '}
@@ -112,7 +125,10 @@ export function ProfessionalsPage() {
             </p>
           </div>
 
-          <ProfessionalFilters selectedFilter={selectedFilter} onChange={setSelectedFilter} />
+          <div className="professionals-toolbar">
+            <ProfessionalSearch value={query} onChange={setQuery} onClear={() => setQuery('')} />
+            <ProfessionalFilters selectedFilter={selectedFilter} onChange={setSelectedFilter} />
+          </div>
           {selectedStyle && <p className="professional-recommendation-note">Las profesionales relacionadas con “{selectedStyle.name}” aparecen primero.</p>}
           <aside className={`any-professional ${isAnyProfessionalSelected ? 'is-selected' : ''}`}>
             <div className="any-professional__mark" aria-hidden="true">✦</div>
@@ -130,7 +146,7 @@ export function ProfessionalsPage() {
               {isAnyProfessionalSelected ? 'Opción elegida' : 'Elegir cualquiera disponible'}
             </button>
           </aside>
-          {filteredProfessionals.length === 0 && (loading || error || professionals.length === 0) ? <PublicContentState loading={loading} error={error} empty="No hay profesionales publicadas todavía." onRetry={retry} /> : <ProfessionalsGrid
+          {filteredProfessionals.length === 0 ? <PublicContentState loading={loading} error={error} empty={professionals.length === 0 ? 'No hay profesionales publicadas todavía.' : 'No encontramos profesionales con esos criterios.'} onRetry={retry} /> : <ProfessionalsGrid
             professionals={filteredProfessionals}
             selectedProfessionalId={selectedProfessional?.id}
             onSelect={selectProfessional}

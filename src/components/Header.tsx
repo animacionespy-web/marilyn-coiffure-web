@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import { siteContent } from '../data/siteContent'
-import { usePublicContent } from '../hooks/usePublicContent'
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { settings } = usePublicContent()
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -21,8 +19,14 @@ export function Header() {
     <header className="site-header">
       <div className="container site-header__inner">
         <a className="brand" href="/" aria-label="Marilyn Coiffure, inicio">
-          <span className="brand__name">{settings.salonName || siteContent.brand}</span>
-          <span className="brand__descriptor">Belleza &amp; estilo</span>
+          <img
+            className="brand__logo"
+            src="/images/brand/marilyn-coiffure-logo.png"
+            alt=""
+            width="706"
+            height="218"
+            aria-hidden="true"
+          />
         </a>
 
         <button

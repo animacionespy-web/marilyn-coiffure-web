@@ -8,11 +8,9 @@ export function StylesPreview() {
     <section className="styles-preview section" id="estilos" aria-labelledby="styles-title">
       <div className="container">
         <div className="section-heading styles-preview__heading">
-          <p className="eyebrow">Inspiración Marilyn</p>
+          <p className="eyebrow">Estilos</p>
           <h2 id="styles-title">Estilos que hablan de vos</h2>
-          <p>
-            Una primera mirada a las experiencias que formarán parte de nuestro próximo catálogo.
-          </p>
+          <p>Inspiración para encontrar tu próximo look.</p>
         </div>
 
         {featuredStyles.length === 0 ? <PublicContentState loading={loading} error={error} empty="No hay estilos destacados publicados todavía." onRetry={retry} /> : <div className="styles-grid">
@@ -35,7 +33,6 @@ export function StylesPreview() {
           <a className="button button--outline" href="/estilos">
             Ver todos los estilos
           </a>
-          <span>Explorá cortes, coloración, peinados y tratamientos.</span>
         </div>
       </div>
     </section>

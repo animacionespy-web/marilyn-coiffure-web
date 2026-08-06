@@ -81,7 +81,7 @@ export function CatalogPage() {
           </div>
 
           <div className="catalog-results-heading">
-            <h2 id="catalog-results-title">Explorá nuestra selección</h2>
+            <h2 id="catalog-results-title">Estilos disponibles</h2>
             <p aria-live="polite">
               {filteredStyles.length} {filteredStyles.length === 1 ? 'estilo encontrado' : 'estilos encontrados'}
             </p>
