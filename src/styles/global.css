@@ -473,26 +473,28 @@ p {
   right: -6px;
   bottom: 28px;
   display: flex;
-  min-width: 190px;
+  min-width: 230px;
   flex-direction: column;
-  padding: 17px 20px;
+  padding: 20px 24px;
   color: var(--ink);
   background: var(--warm-white);
   box-shadow: var(--shadow);
 }
 
 .hero__note span {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   color: var(--taupe);
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .hero__note strong {
   font-family: var(--serif);
-  font-size: 1rem;
+  font-size: 1.8rem;
   font-weight: 400;
+  line-height: 1.05;
 }
 
 .specialties {
