@@ -33,7 +33,7 @@ export const fallbackSiteSettings: SiteSettings = {
   facebookUrl: '',
   heroTitle: siteContent.hero.title,
   heroDescription: siteContent.hero.description,
-  heroImageUrl: '',
+  heroImageUrl: '/images/home/marilyn-portada.jpeg',
   heroImagePath: '',
   aboutTitle: siteContent.about.title,
   aboutText: siteContent.about.paragraphs.join('\n\n'),
@@ -260,6 +260,7 @@ export const settingsService = {
     for (const row of (data ?? []) as DatabaseSettingRow[]) {
       if (row.key in settings) Object.assign(settings, { [row.key]: row.value })
     }
+    if (!settings.heroImageUrl.trim()) settings.heroImageUrl = fallbackSiteSettings.heroImageUrl
     return settings
   },
   async save(values: Partial<SiteSettings>) {

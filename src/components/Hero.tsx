@@ -26,9 +26,9 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="hero__visual" aria-label={siteContent.hero.imagePlaceholder}>
+        <div className="hero__visual" aria-label="Fotografía de portada de Marilyn Coiffure">
           <div className="hero__frame">
-            {settings.heroImageUrl ? <img className="hero__photo" src={settings.heroImageUrl} alt="Presentación de Marilyn Coiffure" /> : <div className="hero__placeholder" role="img" aria-label={siteContent.hero.imagePlaceholder}>
+            {settings.heroImageUrl ? <img className="hero__photo" src={settings.heroImageUrl} alt="Fotografía de portada de Marilyn Coiffure" width="854" height="1280" fetchPriority="high" /> : <div className="hero__placeholder" role="img" aria-label={siteContent.hero.imagePlaceholder}>
               <span className="hero__placeholder-mark">M</span>
               <span className="hero__placeholder-copy">
                 Fotografía
@@ -38,7 +38,7 @@ export function Hero() {
           </div>
           <div className="hero__note">
             <span>Fotografía oficial</span>
-            <strong>Espacio preparado</strong>
+            <strong>Imagen de portada</strong>
           </div>
         </div>
       </div>

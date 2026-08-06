@@ -44,7 +44,7 @@ on conflict do nothing;
 
 insert into public.site_settings (key,value) values
 ('salonName','"Marilyn Coiffure"'::jsonb),('generalWhatsappNumber','""'::jsonb),('domain','"www.marilyncoiffure.com"'::jsonb),('instagramUrl','""'::jsonb),('facebookUrl','""'::jsonb),
-('heroTitle','"Realzá tu belleza con un estilo único"'::jsonb),('heroDescription','"Coloración, peinados y cuidado capilar pensados para acompañar tu esencia con atención dedicada."'::jsonb),('heroImageUrl','""'::jsonb),('heroImagePath','""'::jsonb),
+('heroTitle','"Realzá tu belleza con un estilo único"'::jsonb),('heroDescription','"Coloración, peinados y cuidado capilar pensados para acompañar tu esencia con atención dedicada."'::jsonb),('heroImageUrl','"/images/home/marilyn-portada.jpeg"'::jsonb),('heroImagePath','""'::jsonb),
 ('aboutTitle','"Tu cabello, tu momento, tu mejor versión"'::jsonb),('aboutText','"En Marilyn Coiffure cada atención comienza con una conversación.\n\nLa belleza y el cuidado capilar se encuentran en un ambiente sereno."'::jsonb),
 ('ctaTitle','"¿Lista para encontrar tu próximo estilo?"'::jsonb),('ctaDescription','"Contanos qué tenés en mente y consultá los horarios disponibles."'::jsonb),('formDisclaimer','"La solicitud no confirma el turno. La profesional responderá por WhatsApp."'::jsonb),
 ('address','""'::jsonb),('openingHours','""'::jsonb),('seoTitle','"Marilyn Coiffure | Belleza y estilo"'::jsonb),('seoDescription','"Coloración, peinados y cuidado capilar con atención personalizada en Marilyn Coiffure."'::jsonb),
