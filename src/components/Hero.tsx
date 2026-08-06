@@ -37,8 +37,8 @@ export function Hero() {
             </div>}
           </div>
           <div className="hero__note">
-            <span>Fotografía oficial</span>
-            <strong>Imagen de portada</strong>
+            <span>Dueña</span>
+            <strong>Marilyn</strong>
           </div>
         </div>
       </div>
