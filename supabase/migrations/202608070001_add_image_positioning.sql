@@ -59,13 +59,13 @@ drop policy if exists "settings public read" on public.site_settings;
 create policy "settings public read" on public.site_settings
   for select to anon, authenticated
   using (key in (
-    'siteName', 'generalWhatsappNumber', 'domain', 'instagramUrl', 'address',
-    'openingHours', 'seoTitle', 'seoDescription', 'heroEyebrow', 'heroTitle',
-    'heroDescription', 'heroImageUrl', 'heroImageZoom', 'heroImagePositionX',
-    'heroImagePositionY', 'aboutTitle', 'aboutText', 'ctaTitle', 'ctaText',
-    'formNotice', 'footerText', 'footerImageUrl', 'footerImageZoom',
-    'footerImagePositionX', 'footerImagePositionY'
-  ));
+    'salonName', 'generalWhatsappNumber', 'domain', 'instagramUrl', 'facebookUrl',
+    'heroTitle', 'heroDescription', 'heroImageUrl', 'heroImageZoom',
+    'heroImagePositionX', 'heroImagePositionY', 'aboutTitle', 'aboutText',
+    'ctaTitle', 'ctaDescription', 'formDisclaimer', 'address', 'openingHours',
+    'seoTitle', 'seoDescription', 'specialties', 'footerImageUrl',
+    'footerImageZoom', 'footerImagePositionX', 'footerImagePositionY'
+  ) or public.is_admin());
 
 comment on column public.styles.image_zoom is 'Zoom visual entre 1 y 2.5; no modifica el archivo original.';
 comment on column public.professionals.image_zoom is 'Zoom visual entre 1 y 2.5; no modifica el archivo original.';
