@@ -1,4 +1,5 @@
 import { PositionedImage } from '../../components/PositionedImage'
+import { AboutImageVisual } from '../../components/AboutImageVisual'
 import type { ImagePosition } from '../../types/image'
 
 export type ImageUsage = 'professional' | 'style' | 'product' | 'hero' | 'footer'
@@ -77,12 +78,7 @@ export function ImageContextPreview({ usage, imageUrl, imageAlt, position, title
 
   return (
     <figure className="image-context-preview__footer">
-      <div className="about__visual">
-        <div className="about__arch">
-          {imageUrl ? <PositionedImage src={imageUrl} alt={imageAlt} position={position} /> : <span>MC</span>}
-        </div>
-        <p>Un espacio para sentirte vos</p>
-      </div>
+      <AboutImageVisual imageUrl={imageUrl} imageAlt={imageAlt} position={position} />
       <figcaption>Bloque final del sitio</figcaption>
     </figure>
   )
