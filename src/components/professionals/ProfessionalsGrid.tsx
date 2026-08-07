@@ -13,10 +13,21 @@ interface ProfessionalsGridProps {
 export function ProfessionalsGrid({ professionals, selectedProfessionalId, selectedStyleId, isAnySelected = false, onSelect, onSelectAny }: ProfessionalsGridProps) {
   return (
     <div className="professionals-grid">
-      <article className={`professional-card professional-card--any ${isAnySelected ? 'is-selected' : ''}`}>
-        <div className="professional-card__image professional-card__any-visual"><span aria-hidden="true">MC</span></div>
-        <div className="professional-card__body"><h2>Cualquiera disponible</h2><p className="professional-card__any-copy">El salón elegirá una profesional disponible.</p><button className={`button ${isAnySelected ? 'button--selected' : 'button--dark'}`} type="button" aria-pressed={isAnySelected} onClick={onSelectAny}>{isAnySelected ? '✓ Seleccionada' : 'Elegir opción'}</button></div>
-      </article>
+      <button
+        className={`professional-any-option ${isAnySelected ? 'is-selected' : ''}`}
+        type="button"
+        aria-pressed={isAnySelected}
+        onClick={onSelectAny}
+      >
+        <span className="professional-any-option__mark" aria-hidden="true">MC</span>
+        <span className="professional-any-option__copy">
+          <strong>Cualquiera disponible</strong>
+          <small>El salón elige por vos.</small>
+        </span>
+        <span className="professional-any-option__state">
+          {isAnySelected ? '✓ Seleccionada' : 'Elegir'}
+        </span>
+      </button>
       {professionals.map((professional) => (
         <ProfessionalCard
           professional={professional}
