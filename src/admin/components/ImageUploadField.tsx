@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { uploadSiteImage, validateImage } from '../../services/storage'
 import type { UploadResult } from '../../types/admin'
+import type { ImagePosition } from '../../types/image'
+import { PositionedImage } from '../../components/PositionedImage'
 
-export function ImageUploadField({ folder, imageUrl, label, onUploaded }: {
+export function ImageUploadField({ folder, imageUrl, imagePosition, label, onUploaded }: {
   folder: 'styles' | 'professionals' | 'products' | 'home'
   imageUrl: string
+  imagePosition?: ImagePosition
   label: string
   onUploaded: (result: UploadResult) => void
 }) {
@@ -33,7 +36,7 @@ export function ImageUploadField({ folder, imageUrl, label, onUploaded }: {
     <div className="admin-image-field">
       <span className="admin-field-label">{label}</span>
       <div className="admin-image-field__preview">
-        {imageUrl ? <img src={imageUrl} alt="Vista previa de la imagen seleccionada" /> : <span>Sin imagen</span>}
+        {imageUrl ? <PositionedImage src={imageUrl} alt="Vista previa de la imagen seleccionada" position={imagePosition} /> : <span>Sin imagen</span>}
       </div>
       <label className="admin-button admin-button--secondary">
         {uploading ? 'Subiendo…' : 'Seleccionar imagen'}

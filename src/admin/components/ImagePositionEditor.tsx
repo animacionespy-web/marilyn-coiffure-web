@@ -1,28 +1,31 @@
 import { useId, useState } from 'react'
-import { PositionedImage } from '../../components/PositionedImage'
 import type { ImagePosition } from '../../types/image'
 import { DEFAULT_IMAGE_POSITION, normalizeImagePosition } from '../../types/image'
-
-export interface ImagePreviewShape {
-  label: string
-  aspectRatio: string
-}
+import { ImageContextPreview, type ImageUsage } from './ImageContextPreview'
 
 interface ImagePositionEditorProps {
   imageUrl: string
   imageAlt: string
   value: ImagePosition
-  previews: ImagePreviewShape[]
+  usage: ImageUsage
+  title?: string
+  category?: string
+  description?: string
+  tags?: string[]
   onSave: (value: ImagePosition) => void
 }
 
-export function ImagePositionEditor({ imageUrl, imageAlt, value, previews, onSave }: ImagePositionEditorProps) {
+export function ImagePositionEditor({ imageUrl, imageAlt, value, usage, title, category, description, tags, onSave }: ImagePositionEditorProps) {
   const id = useId()
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<ImagePosition>(() => normalizeImagePosition(value))
   const [message, setMessage] = useState('')
 
-  if (!imageUrl) return null
+  if (!imageUrl) {
+    return usage === 'footer'
+      ? <div className="image-position-editor image-position-editor--fallback"><ImageContextPreview usage={usage} imageUrl="" imageAlt="" position={DEFAULT_IMAGE_POSITION} /></div>
+      : null
+  }
 
   const openEditor = () => {
     setDraft(normalizeImagePosition(value))
@@ -37,7 +40,7 @@ export function ImagePositionEditor({ imageUrl, imageAlt, value, previews, onSav
 
   const save = () => {
     onSave(normalizeImagePosition(draft))
-    setMessage('Encuadre aplicado. Guardá el formulario para publicarlo.')
+    setMessage('Así se verá la imagen en la web.')
     setOpen(false)
   }
 
@@ -46,7 +49,7 @@ export function ImagePositionEditor({ imageUrl, imageAlt, value, previews, onSav
       {!open ? (
         <div className="image-position-editor__launcher">
           <button className="admin-button admin-button--secondary" type="button" onClick={openEditor}>Ajustar encuadre</button>
-          {message && <small role="status">{message}</small>}
+          {message && <span className="image-position-editor__message" role="status"><strong>{message}</strong><small>El ajuste se guarda al guardar el formulario.</small></span>}
         </div>
       ) : (
         <section className="image-position-editor__panel" aria-labelledby={`${id}-title`}>
@@ -55,15 +58,8 @@ export function ImagePositionEditor({ imageUrl, imageAlt, value, previews, onSav
             <button type="button" className="image-position-editor__close" onClick={() => setOpen(false)} aria-label="Cerrar ajustador de imagen">×</button>
           </div>
 
-          <div className={`image-position-editor__previews ${previews.length > 1 ? 'has-multiple' : ''}`}>
-            {previews.map((preview) => (
-              <figure key={preview.label}>
-                <div className="image-position-editor__preview" style={{ aspectRatio: preview.aspectRatio }}>
-                  <PositionedImage src={imageUrl} alt={imageAlt} position={draft} />
-                </div>
-                <figcaption>{preview.label}</figcaption>
-              </figure>
-            ))}
+          <div className={`image-position-editor__previews image-position-editor__previews--${usage}`}>
+            <ImageContextPreview usage={usage} imageUrl={imageUrl} imageAlt={imageAlt} position={draft} title={title} category={category} description={description} tags={tags} />
           </div>
 
           <div className="image-position-editor__controls">
