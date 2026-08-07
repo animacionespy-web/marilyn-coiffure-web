@@ -9,21 +9,26 @@ export function Hero() {
       <div className="hero__ornament" aria-hidden="true" />
       <div className="container hero__grid">
         <div className="hero__content">
-          <p className="eyebrow">{siteContent.hero.eyebrow}</p>
-          <h1 id="hero-title">{settings.heroTitle}</h1>
-          <p className="hero__description">{settings.heroDescription}</p>
-          <div className="hero__actions">
-            <a className="button button--dark" href={siteContent.actions.availability.href}>
-              {siteContent.actions.availability.label}
-            </a>
-            <a className="button hero__styles-button" href={siteContent.actions.styles.href}>
-              {siteContent.actions.styles.label}
-              <span aria-hidden="true">↗</span>
-            </a>
+          <div className="hero__intro">
+            <p className="eyebrow">{siteContent.hero.eyebrow}</p>
+            <h1 id="hero-title">{settings.heroTitle}</h1>
           </div>
-          <div className="hero__signature" aria-hidden="true">
-            <span />
-            Cuidado que se nota
+          <div className="hero__details">
+            <p className="hero__description hero__description--desktop">{settings.heroDescription}</p>
+            <p className="hero__description hero__description--mobile">{siteContent.hero.mobileDescription}</p>
+            <div className="hero__actions">
+              <a className="button button--dark" href={siteContent.actions.availability.href}>
+                {siteContent.actions.availability.label}
+              </a>
+              <a className="button hero__styles-button" href={siteContent.actions.styles.href}>
+                {siteContent.actions.styles.label}
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div className="hero__signature" aria-hidden="true">
+              <span />
+              Cuidado que se nota
+            </div>
           </div>
         </div>
 

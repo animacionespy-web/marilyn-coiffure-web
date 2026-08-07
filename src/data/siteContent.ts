@@ -17,6 +17,7 @@ export const siteContent = {
     title: 'Realzá tu belleza con un estilo único',
     description:
       'Coloración, peinados y cuidado capilar pensados para acompañar tu esencia con atención dedicada y resultados que se sienten propios.',
+    mobileDescription: 'Coloración, peinados y cuidado capilar con atención personalizada.',
     imagePlaceholder: 'Espacio reservado para la fotografía de la dueña',
   },
   specialties: [
