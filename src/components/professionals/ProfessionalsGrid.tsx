@@ -14,8 +14,8 @@ export function ProfessionalsGrid({ professionals, selectedProfessionalId, selec
   return (
     <div className="professionals-grid">
       <article className={`professional-card professional-card--any ${isAnySelected ? 'is-selected' : ''}`}>
-        <div className="professional-card__image professional-card__any-visual"><span aria-hidden="true">✦</span></div>
-        <div className="professional-card__body"><p className="professional-card__role">Más flexibilidad</p><h2>Cualquiera disponible</h2><p className="professional-card__any-copy">El salón seleccionará a una profesional disponible para el servicio.</p><button className={`button ${isAnySelected ? 'button--selected' : 'button--dark'}`} type="button" aria-pressed={isAnySelected} onClick={onSelectAny}>{isAnySelected ? '✓ Seleccionada' : 'Elegir esta opción'}</button></div>
+        <div className="professional-card__image professional-card__any-visual"><span aria-hidden="true">MC</span></div>
+        <div className="professional-card__body"><h2>Cualquiera disponible</h2><p className="professional-card__any-copy">El salón elegirá una profesional disponible.</p><button className={`button ${isAnySelected ? 'button--selected' : 'button--dark'}`} type="button" aria-pressed={isAnySelected} onClick={onSelectAny}>{isAnySelected ? '✓ Seleccionada' : 'Elegir opción'}</button></div>
       </article>
       {professionals.map((professional) => (
         <ProfessionalCard

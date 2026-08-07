@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CatalogHero } from '../components/catalog/CatalogHero'
 import { CategoryFilters } from '../components/catalog/CategoryFilters'
 import { EmptyResults } from '../components/catalog/EmptyResults'
@@ -13,6 +13,7 @@ import type { Style, StyleCategoryFilter } from '../types/style'
 import type { Professional } from '../types/professional'
 import { clearSelectedProfessional, getProfessionalSelection } from '../utils/professionalSelection'
 import { getSelectedStyleId, saveSelectedStyle } from '../utils/styleSelection'
+import { scrollToElement } from '../utils/scroll'
 
 const normalizeText = (value: string) =>
   value
@@ -28,6 +29,8 @@ export function CatalogPage() {
   const [selectedStyle, setSelectedStyle] = useState<Style | undefined>()
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | undefined>()
   const [isAnyProfessional, setIsAnyProfessional] = useState(false)
+  const selectionSectionRef = useRef<HTMLElement>(null)
+  const summaryRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -43,6 +46,16 @@ export function CatalogPage() {
       ? professionalSlug !== 'cualquiera' && item.slug === professionalSlug
       : professionalSelection?.mode === 'specific' && item.id === professionalSelection.professionalId))
   }, [professionals, styles])
+
+  useEffect(() => {
+    if (loading) return
+    const focusTarget = new URLSearchParams(window.location.search).get('focus')
+    if (focusTarget === 'selector') {
+      scrollToElement(() => selectionSectionRef.current)
+    } else if (focusTarget === 'resumen') {
+      scrollToElement(() => summaryRef.current)
+    }
+  }, [loading, selectedStyle, selectedProfessional, isAnyProfessional])
 
   useDocumentMeta(
     'Catálogo de estilos | Marilyn Coiffure',
@@ -83,11 +96,17 @@ export function CatalogPage() {
 
   const selectStyle = (style: Style) => {
     saveSelectedStyle(style)
+    const hasProfessional = Boolean(selectedProfessional || isAnyProfessional)
+    if (!hasProfessional) {
+      window.location.assign(`/profesionales?estilo=${style.slug}&focus=selector`)
+      return
+    }
     setSelectedStyle(style)
     const params = new URLSearchParams({ seleccion: style.slug })
     if (selectedProfessional) params.set('profesional', selectedProfessional.slug)
     else if (isAnyProfessional) params.set('profesional', 'cualquiera')
     window.history.replaceState(null, '', `/estilos?${params.toString()}`)
+    scrollToElement(() => summaryRef.current)
   }
 
   const removeProfessional = () => {
@@ -100,7 +119,7 @@ export function CatalogPage() {
   return (
     <>
       <CatalogHero />
-      <section className="catalog-content section" aria-labelledby="catalog-results-title">
+      <section className="catalog-content section" aria-labelledby="catalog-results-title" ref={selectionSectionRef}>
         <div className="container">
           {(selectedProfessional || isAnyProfessional) && <CompactSelectionBar eyebrow="Profesional elegida" title={isAnyProfessional ? 'Cualquiera disponible' : selectedProfessional?.name ?? ''} subtitle={selectedProfessional?.specialties[0]} image={selectedProfessional?.image} imageAlt={selectedProfessional?.imageAlt} changeHref={selectedStyle ? `/profesionales?estilo=${selectedStyle.slug}` : '/profesionales'} onRemove={removeProfessional} />}
           <div className="choice-heading"><h2>Elegí el estilo que querés consultar</h2></div>
@@ -126,7 +145,7 @@ export function CatalogPage() {
             <EmptyResults onReset={resetFilters} />
           )}
 
-          {(selectedStyle || selectedProfessional || isAnyProfessional) && <FlowSelectionSummary style={selectedStyle} professional={selectedProfessional} anyProfessional={isAnyProfessional} />}
+          {(selectedStyle || selectedProfessional || isAnyProfessional) && <FlowSelectionSummary style={selectedStyle} professional={selectedProfessional} anyProfessional={isAnyProfessional} sectionRef={summaryRef} />}
         </div>
       </section>
     </>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ProfessionalFilters } from '../components/professionals/ProfessionalFilters'
 import { ProfessionalSearch } from '../components/professionals/ProfessionalSearch'
 import { ProfessionalsGrid } from '../components/professionals/ProfessionalsGrid'
@@ -13,6 +13,7 @@ import type { Professional, ProfessionalSpecialtyFilter } from '../types/profess
 import type { Style } from '../types/style'
 import { getProfessionalSelection, getSelectedProfessionalId, saveAnyProfessionalSelection, saveSelectedProfessional } from '../utils/professionalSelection'
 import { clearSelectedStyle, getSelectedStyleId } from '../utils/styleSelection'
+import { scrollToElement } from '../utils/scroll'
 
 const normalizeText = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es').trim()
 
@@ -23,6 +24,8 @@ export function ProfessionalsPage() {
   const [selectedStyle, setSelectedStyle] = useState<Style | undefined>()
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | undefined>()
   const [isAnyProfessionalSelected, setIsAnyProfessionalSelected] = useState(false)
+  const selectionSectionRef = useRef<HTMLElement>(null)
+  const summaryRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -35,6 +38,12 @@ export function ProfessionalsPage() {
       ? professionalSlug !== 'cualquiera' && professional.slug === professionalSlug
       : professional.id === getSelectedProfessionalId()))
   }, [professionals, styles])
+
+  useEffect(() => {
+    if (!loading && new URLSearchParams(window.location.search).get('focus') === 'selector') {
+      scrollToElement(() => selectionSectionRef.current)
+    }
+  }, [loading])
 
   useDocumentMeta('Profesionales | Marilyn Coiffure', 'Conocé al equipo de Marilyn Coiffure y elegí la profesional ideal para consultar disponibilidad.')
 
@@ -56,16 +65,26 @@ export function ProfessionalsPage() {
 
   const selectProfessional = (professional: Professional) => {
     saveSelectedProfessional(professional)
+    if (!selectedStyle) {
+      window.location.assign(`/estilos?profesional=${professional.slug}&focus=selector`)
+      return
+    }
     setSelectedProfessional(professional)
     setIsAnyProfessionalSelected(false)
     updateUrl(professional)
+    scrollToElement(() => summaryRef.current)
   }
 
   const selectAnyProfessional = () => {
     saveAnyProfessionalSelection()
+    if (!selectedStyle) {
+      window.location.assign('/estilos?profesional=cualquiera&focus=selector')
+      return
+    }
     setSelectedProfessional(undefined)
     setIsAnyProfessionalSelected(true)
     updateUrl(undefined, selectedStyle, true)
+    scrollToElement(() => summaryRef.current)
   }
 
   const removeStyle = () => {
@@ -77,13 +96,13 @@ export function ProfessionalsPage() {
   return (
     <main id="contenido-principal">
       <ProfessionalsHero />
-      <section className="professionals-content section" aria-labelledby="professionals-list-title">
+      <section className="professionals-content section" aria-labelledby="professionals-list-title" ref={selectionSectionRef}>
         <div className="container">
           {selectedStyle && <CompactSelectionBar eyebrow="Estilo elegido" title={selectedStyle.name} image={selectedStyle.image} imageAlt={selectedStyle.imageAlt} changeHref="/estilos" onRemove={removeStyle} />}
           <div className="professionals-list-heading"><div><h2 id="professionals-list-title">Elegí una profesional</h2></div><p aria-live="polite">{filteredProfessionals.length} {filteredProfessionals.length === 1 ? 'profesional disponible' : 'profesionales disponibles'}</p></div>
           <div className="professionals-toolbar"><ProfessionalSearch value={query} onChange={setQuery} onClear={() => setQuery('')} /><ProfessionalFilters selectedFilter={selectedFilter} onChange={setSelectedFilter} /></div>
           {filteredProfessionals.length === 0 ? <PublicContentState loading={loading} error={error} empty={professionals.length === 0 ? 'No hay profesionales publicadas todavía.' : 'No encontramos profesionales con esos criterios.'} onRetry={retry} /> : <ProfessionalsGrid professionals={filteredProfessionals} selectedProfessionalId={selectedProfessional?.id} selectedStyleId={selectedStyle?.id} isAnySelected={isAnyProfessionalSelected} onSelect={selectProfessional} onSelectAny={selectAnyProfessional} />}
-          {(selectedProfessional || isAnyProfessionalSelected) && <FlowSelectionSummary professional={selectedProfessional} anyProfessional={isAnyProfessionalSelected} style={selectedStyle} />}
+          {(selectedProfessional || isAnyProfessionalSelected) && <FlowSelectionSummary professional={selectedProfessional} anyProfessional={isAnyProfessionalSelected} style={selectedStyle} sectionRef={summaryRef} />}
         </div>
       </section>
     </main>

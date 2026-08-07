@@ -4,13 +4,14 @@ import { usePublicContent } from '../hooks/usePublicContent'
 import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import type { Style } from '../types/style'
 import { saveSelectedStyle } from '../utils/styleSelection'
+import { getProfessionalSelection } from '../utils/professionalSelection'
 
 interface StyleDetailPageProps {
   slug: string
 }
 
 export function StyleDetailPage({ slug }: StyleDetailPageProps) {
-  const { styles, loading, error, retry } = usePublicContent()
+  const { styles, professionals, loading, error, retry } = usePublicContent()
   const style = styles.find((item) => item.slug === slug)
 
   useDocumentMeta(
@@ -20,7 +21,19 @@ export function StyleDetailPage({ slug }: StyleDetailPageProps) {
 
   const selectStyle = (selectedStyle: Style) => {
     saveSelectedStyle(selectedStyle)
-    window.location.assign(`/estilos?seleccion=${selectedStyle.slug}`)
+    const professionalSelection = getProfessionalSelection()
+    if (!professionalSelection) {
+      window.location.assign(`/profesionales?estilo=${selectedStyle.slug}&focus=selector`)
+      return
+    }
+    const professionalParam = professionalSelection.mode === 'any'
+      ? 'cualquiera'
+      : professionals.find((professional) => professional.id === professionalSelection.professionalId)?.slug
+    if (!professionalParam) {
+      window.location.assign(`/profesionales?estilo=${selectedStyle.slug}&focus=selector`)
+      return
+    }
+    window.location.assign(`/estilos?seleccion=${selectedStyle.slug}&profesional=${professionalParam}&focus=resumen`)
   }
 
   if (!style && (loading || error)) {
