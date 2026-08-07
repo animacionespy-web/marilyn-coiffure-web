@@ -1,6 +1,7 @@
 import { usePublicContent } from '../hooks/usePublicContent'
 import { PublicContentState } from './PublicContentState'
 import { PositionedImage } from './PositionedImage'
+import { HomeCarousel } from './HomeCarousel'
 
 export function ProfessionalsPreview() {
   const { professionals, loading, error, retry } = usePublicContent()
@@ -21,7 +22,7 @@ export function ProfessionalsPreview() {
         {visibleProfessionals.length === 0 ? (
           <PublicContentState loading={loading} error={error} empty="No hay profesionales publicadas todavía." onRetry={retry} />
         ) : (
-          <div className="home-professionals__grid">
+          <HomeCarousel className="home-professionals__grid" ariaLabel="Profesionales destacadas">
             {visibleProfessionals.map((professional) => (
               <article className="home-professional-card" key={professional.id}>
                 <div className="home-professional-card__image">
@@ -34,8 +35,9 @@ export function ProfessionalsPreview() {
                 </div>
               </article>
             ))}
-          </div>
+          </HomeCarousel>
         )}
+        <div className="home-professionals__footer"><a className="button button--outline" href="/profesionales">Ver profesionales</a></div>
       </div>
     </section>
   )

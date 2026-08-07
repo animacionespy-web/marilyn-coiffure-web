@@ -1,6 +1,7 @@
 import { usePublicContent } from '../hooks/usePublicContent'
 import { PublicContentState } from './PublicContentState'
 import { PositionedImage } from './PositionedImage'
+import { HomeCarousel } from './HomeCarousel'
 
 const categoryPriority = ['Peinados', 'Coloración', 'Cortes', 'Quinceañeras', 'Tratamientos']
 
@@ -17,7 +18,7 @@ export function StylesPreview() {
           <h2 id="styles-title">Estilos que realzan tu belleza</h2>
           <p>Descubrí peinados, cortes y colores pensados para cada ocasión.</p>
         </div>
-        {featuredStyles.length === 0 ? <PublicContentState loading={loading} error={error} empty="No hay estilos destacados publicados todavía." onRetry={retry} /> : <div className="styles-grid">{featuredStyles.slice(0, 3).map((style, index) => <article className="style-card" key={style.id}><a className="style-card__visual" href={`/estilos/${style.slug}`} aria-label={`Ver detalles de ${style.name}`}><PositionedImage src={style.image} alt={style.imageAlt} loading="lazy" width="640" height="760" position={style.imagePosition} /><span aria-hidden="true">0{index + 1}</span></a><div className="style-card__body"><p>{style.category}</p><h3><a href={`/estilos/${style.slug}`}>{style.name}</a></h3><span>{style.shortDescription}</span></div></article>)}</div>}
+        {featuredStyles.length === 0 ? <PublicContentState loading={loading} error={error} empty="No hay estilos destacados publicados todavía." onRetry={retry} /> : <HomeCarousel className="styles-grid" ariaLabel="Estilos destacados">{featuredStyles.slice(0, 3).map((style, index) => <article className="style-card" key={style.id}><a className="style-card__visual" href={`/estilos/${style.slug}`} aria-label={`Ver detalles de ${style.name}`}><PositionedImage src={style.image} alt={style.imageAlt} loading="lazy" width="640" height="760" position={style.imagePosition} /><span aria-hidden="true">0{index + 1}</span></a><div className="style-card__body"><p>{style.category}</p><h3><a href={`/estilos/${style.slug}`}>{style.name}</a></h3><span>{style.shortDescription}</span></div></article>)}</HomeCarousel>}
         <div className="styles-preview__footer"><a className="button button--outline" href="/estilos">Ver todos los estilos</a></div>
       </div>
     </section>
