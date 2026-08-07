@@ -1,5 +1,6 @@
 import { usePublicContent } from '../hooks/usePublicContent'
 import { PublicContentState } from './PublicContentState'
+import { PositionedImage } from './PositionedImage'
 
 export function ProfessionalsPreview() {
   const { professionals, loading, error, retry } = usePublicContent()
@@ -24,7 +25,7 @@ export function ProfessionalsPreview() {
             {visibleProfessionals.map((professional) => (
               <article className="home-professional-card" key={professional.id}>
                 <div className="home-professional-card__image">
-                  <img src={professional.image} alt={professional.imageAlt} loading="lazy" width="640" height="760" />
+                  <PositionedImage src={professional.image} alt={professional.imageAlt} loading="lazy" width="640" height="760" position={professional.imagePosition} />
                 </div>
                 <div className="home-professional-card__body">
                   <p>{professional.specialties[0] || professional.role}</p>

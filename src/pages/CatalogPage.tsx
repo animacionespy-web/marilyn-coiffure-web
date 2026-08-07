@@ -121,7 +121,7 @@ export function CatalogPage() {
       <CatalogHero />
       <section className="catalog-content section" aria-labelledby="catalog-results-title" ref={selectionSectionRef}>
         <div className="container">
-          {(selectedProfessional || isAnyProfessional) && <CompactSelectionBar eyebrow="Profesional elegida" title={isAnyProfessional ? 'Cualquiera disponible' : selectedProfessional?.name ?? ''} subtitle={selectedProfessional?.specialties[0]} image={selectedProfessional?.image} imageAlt={selectedProfessional?.imageAlt} changeHref={selectedStyle ? `/profesionales?estilo=${selectedStyle.slug}` : '/profesionales'} onRemove={removeProfessional} />}
+          {(selectedProfessional || isAnyProfessional) && <CompactSelectionBar eyebrow="Profesional elegida" title={isAnyProfessional ? 'Cualquiera disponible' : selectedProfessional?.name ?? ''} subtitle={selectedProfessional?.specialties[0]} image={selectedProfessional?.image} imageAlt={selectedProfessional?.imageAlt} imagePosition={selectedProfessional?.imagePosition} changeHref={selectedStyle ? `/profesionales?estilo=${selectedStyle.slug}` : '/profesionales'} onRemove={removeProfessional} />}
           <div className="choice-heading"><h2>Elegí el estilo que querés consultar</h2></div>
           <div className="catalog-toolbar">
             <StyleSearch value={query} onChange={setQuery} onClear={() => setQuery('')} />

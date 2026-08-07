@@ -7,9 +7,11 @@ import { createSlug } from '../../utils/admin'
 import { AdminEmpty, AdminError, AdminLoading } from '../components/AdminFeedback'
 import { AdminPageHeader } from '../components/AdminPageHeader'
 import { ImageUploadField } from '../components/ImageUploadField'
+import { ImagePositionEditor } from '../components/ImagePositionEditor'
+import { DEFAULT_IMAGE_POSITION } from '../../types/image'
 
 const emptyProduct: AdminProduct = {
-  id: '', name: '', slug: '', category: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', featured: false, active: true, displayOrder: 0, price: null, stockStatus: '',
+  id: '', name: '', slug: '', category: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION }, featured: false, active: true, displayOrder: 0, price: null, stockStatus: '',
 }
 
 export function AdminProductsPage() {
@@ -97,7 +99,7 @@ export function AdminProductsPage() {
         <label className="admin-form__wide">Descripción completa<textarea rows={4} value={editing.fullDescription} onChange={(event) => update('fullDescription', event.target.value)} /></label>
         <label>Precio opcional<input type="number" min="0" step="1" value={editing.price ?? ''} onChange={(event) => update('price', event.target.value ? Number(event.target.value) : null)} /></label>
         <label>Estado de stock opcional<input value={editing.stockStatus} onChange={(event) => update('stockStatus', event.target.value)} /></label>
-        <div className="admin-form__wide"><ImageUploadField folder="products" label="Fotografía" imageUrl={editing.imageUrl} onUploaded={(result) => { if (!previousImagePath) setPreviousImagePath(editing.imagePath); setEditing((current) => current ? { ...current, imageUrl: result.publicUrl, imagePath: result.path } : current) }} /></div>
+        <div className="admin-form__wide"><ImageUploadField folder="products" label="Fotografía" imageUrl={editing.imageUrl} onUploaded={(result) => { if (!previousImagePath) setPreviousImagePath(editing.imagePath); setEditing((current) => current ? { ...current, imageUrl: result.publicUrl, imagePath: result.path, imagePosition: { ...DEFAULT_IMAGE_POSITION } } : current) }} /><ImagePositionEditor imageUrl={editing.imageUrl} imageAlt={`Vista previa de ${editing.name || 'producto'}`} value={editing.imagePosition} previews={[{ label: 'Tarjeta de producto', aspectRatio: '5 / 4' }]} onSave={(imagePosition) => update('imagePosition', imagePosition)} /></div>
         <label className="admin-check"><input type="checkbox" checked={editing.active} onChange={(event) => update('active', event.target.checked)} />Visible en la web</label>
         <label className="admin-check"><input type="checkbox" checked={editing.featured} onChange={(event) => update('featured', event.target.checked)} />Destacado en portada</label>
         {error && <p className="admin-field-error admin-form__wide" role="alert">{error}</p>}

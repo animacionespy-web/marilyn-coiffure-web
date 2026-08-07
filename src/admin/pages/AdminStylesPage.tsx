@@ -7,9 +7,11 @@ import { removeSiteImage } from '../../services/storage'
 import type { AdminProfessional, AdminStyle, Category } from '../../types/admin'
 import { createSlug } from '../../utils/admin'
 import { useDocumentMeta } from '../../hooks/useDocumentMeta'
+import { DEFAULT_IMAGE_POSITION } from '../../types/image'
+import { ImagePositionEditor } from '../components/ImagePositionEditor'
 
 const emptyStyle: AdminStyle = {
-  id: '', categoryId: '', name: '', slug: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', tags: [], featured: false, active: true, displayOrder: 0, estimatedDuration: '', priceFrom: null, professionalIds: [],
+  id: '', categoryId: '', name: '', slug: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION }, tags: [], featured: false, active: true, displayOrder: 0, estimatedDuration: '', priceFrom: null, professionalIds: [],
 }
 
 export function AdminStylesPage() {
@@ -103,7 +105,7 @@ export function AdminStylesPage() {
             <label>Etiquetas separadas por coma<input value={editing.tags.join(', ')} onChange={(event) => update('tags', event.target.value.split(',').map((item) => item.trim()).filter(Boolean))} /></label>
             <label>Duración estimada<input value={editing.estimatedDuration} onChange={(event) => update('estimatedDuration', event.target.value)} /></label>
             <label>Precio desde opcional<input type="number" min="0" step="1" value={editing.priceFrom ?? ''} onChange={(event) => update('priceFrom', event.target.value ? Number(event.target.value) : null)} /></label>
-            <div className="admin-form__wide"><ImageUploadField folder="styles" label="Fotografía" imageUrl={editing.imageUrl} onUploaded={(result) => { if (!previousImagePath) setPreviousImagePath(editing.imagePath); setEditing((current) => current ? { ...current, imageUrl: result.publicUrl, imagePath: result.path } : current) }} /></div>
+            <div className="admin-form__wide"><ImageUploadField folder="styles" label="Fotografía" imageUrl={editing.imageUrl} onUploaded={(result) => { if (!previousImagePath) setPreviousImagePath(editing.imagePath); setEditing((current) => current ? { ...current, imageUrl: result.publicUrl, imagePath: result.path, imagePosition: { ...DEFAULT_IMAGE_POSITION } } : current) }} /><ImagePositionEditor imageUrl={editing.imageUrl} imageAlt={`Vista previa de ${editing.name || 'estilo'}`} value={editing.imagePosition} previews={[{ label: 'Tarjeta de estilo', aspectRatio: '4 / 4.7' }]} onSave={(imagePosition) => update('imagePosition', imagePosition)} /></div>
             <fieldset className="admin-form__wide admin-checkbox-grid"><legend>Profesionales relacionadas</legend>{professionals.map((professional) => <label className="admin-check" key={professional.id}><input type="checkbox" checked={editing.professionalIds.includes(professional.id)} onChange={(event) => update('professionalIds', event.target.checked ? [...editing.professionalIds, professional.id] : editing.professionalIds.filter((id) => id !== professional.id))} />{professional.name}</label>)}</fieldset>
             <label className="admin-check"><input type="checkbox" checked={editing.active} onChange={(event) => update('active', event.target.checked)} />Visible en la web</label>
             <label className="admin-check"><input type="checkbox" checked={editing.featured} onChange={(event) => update('featured', event.target.checked)} />Destacado en portada</label>

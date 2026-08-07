@@ -1,5 +1,6 @@
 import { siteContent } from '../data/siteContent'
 import { usePublicContent } from '../hooks/usePublicContent'
+import { PositionedImage } from './PositionedImage'
 
 export function Hero() {
   const { settings } = usePublicContent()
@@ -28,7 +29,7 @@ export function Hero() {
 
         <div className="hero__visual" aria-label="Fotografía de portada de Marilyn Coiffure">
           <div className="hero__frame">
-            {settings.heroImageUrl ? <img className="hero__photo" src={settings.heroImageUrl} alt="Fotografía de portada de Marilyn Coiffure" width="854" height="1280" fetchPriority="high" /> : <div className="hero__placeholder" role="img" aria-label={siteContent.hero.imagePlaceholder}>
+            {settings.heroImageUrl ? <PositionedImage className="hero__photo" src={settings.heroImageUrl} alt="Fotografía de portada de Marilyn Coiffure" width="854" height="1280" fetchPriority="high" position={{ zoom: settings.heroImageZoom, positionX: settings.heroImagePositionX, positionY: settings.heroImagePositionY }} /> : <div className="hero__placeholder" role="img" aria-label={siteContent.hero.imagePlaceholder}>
               <span className="hero__placeholder-mark">M</span>
               <span className="hero__placeholder-copy">
                 Fotografía

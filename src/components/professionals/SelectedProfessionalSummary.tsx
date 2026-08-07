@@ -1,5 +1,6 @@
 import type { Professional } from '../../types/professional'
 import type { Style } from '../../types/style'
+import { PositionedImage } from '../PositionedImage'
 
 interface SelectedProfessionalSummaryProps {
   professional?: Professional
@@ -19,7 +20,7 @@ export function SelectedProfessionalSummary({ professional, isAnyProfessional = 
       aria-labelledby="selected-professional-title"
     >
       {professional
-        ? <img src={professional.image} alt="" width="220" height="260" />
+        ? <PositionedImage src={professional.image} alt="" width="220" height="260" position={professional.imagePosition} />
         : <div className="selected-professional__any-mark" aria-hidden="true">✦</div>}
       <div>
         <p className="eyebrow">Selección guardada temporalmente</p>

@@ -1,4 +1,5 @@
 import type { Professional } from '../../types/professional'
+import { PositionedImage } from '../PositionedImage'
 
 interface ProfessionalCardProps {
   professional: Professional
@@ -11,12 +12,13 @@ export function ProfessionalCard({ professional, isSelected, isRecommended, onSe
   return (
     <article className={`professional-card ${isSelected ? 'is-selected' : ''}`}>
       <div className="professional-card__image">
-        <img
+        <PositionedImage
           src={professional.image}
           alt={professional.imageAlt}
           loading="lazy"
           width="640"
           height="760"
+          position={professional.imagePosition}
         />
         {isRecommended ? <span>Recomendada para este estilo</span> : professional.featured && <span>Especialista destacada</span>}
       </div>

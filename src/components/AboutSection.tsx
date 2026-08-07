@@ -1,5 +1,6 @@
 import { siteContent } from '../data/siteContent'
 import { usePublicContent } from '../hooks/usePublicContent'
+import { PositionedImage } from './PositionedImage'
 
 export function AboutSection() {
   const { settings } = usePublicContent()
@@ -9,7 +10,9 @@ export function AboutSection() {
       <div className="container about__grid">
         <div className="about__visual" aria-hidden="true">
           <div className="about__arch">
-            <span>MC</span>
+            {settings.footerImageUrl
+              ? <PositionedImage src={settings.footerImageUrl} alt="Imagen del salón Marilyn Coiffure" loading="lazy" width="840" height="880" position={{ zoom: settings.footerImageZoom, positionX: settings.footerImagePositionX, positionY: settings.footerImagePositionY }} />
+              : <span>MC</span>}
           </div>
           <p>Un espacio para sentirte vos</p>
         </div>

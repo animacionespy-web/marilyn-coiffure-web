@@ -1,3 +1,5 @@
+import type { ImagePosition } from './image'
+
 export type StyleCategory =
   | 'Cortes'
   | 'Coloración'
@@ -16,6 +18,7 @@ export interface Style {
   fullDescription: string
   image: string
   imageAlt: string
+  imagePosition?: ImagePosition
   tags: string[]
   featured: boolean
   order: number

@@ -23,6 +23,7 @@ import type {
   DatabaseStyleRow,
 } from '../types/database'
 import { humanizeDataError } from '../utils/admin'
+import { normalizeImagePosition } from '../types/image'
 
 interface StyleProfessionalRow {
   style_id: string
@@ -39,6 +40,14 @@ export const fallbackSiteSettings: SiteSettings = {
   heroDescription: siteContent.hero.description,
   heroImageUrl: '/images/home/marilyn-portada.jpeg',
   heroImagePath: '',
+  heroImageZoom: 1,
+  heroImagePositionX: 50,
+  heroImagePositionY: 34,
+  footerImageUrl: '',
+  footerImagePath: '',
+  footerImageZoom: 1,
+  footerImagePositionX: 50,
+  footerImagePositionY: 50,
   aboutTitle: siteContent.about.title,
   aboutText: siteContent.about.paragraphs.join('\n\n'),
   ctaTitle: siteContent.contact.title,
@@ -78,6 +87,11 @@ function mapAdminStyle(row: DatabaseStyleRow, professionalIds: string[]): AdminS
     fullDescription: row.full_description ?? '',
     imageUrl: row.image_url ?? '',
     imagePath: row.image_path ?? '',
+    imagePosition: normalizeImagePosition({
+      zoom: row.image_zoom ?? 1,
+      positionX: row.image_position_x ?? 50,
+      positionY: row.image_position_y ?? 50,
+    }),
     tags: row.tags ?? [],
     featured: row.featured,
     active: row.active,
@@ -98,6 +112,11 @@ function mapAdminProfessional(row: DatabaseProfessionalRow, styleIds: string[]):
     fullDescription: row.full_description ?? '',
     imageUrl: row.image_url ?? '',
     imagePath: row.image_path ?? '',
+    imagePosition: normalizeImagePosition({
+      zoom: row.image_zoom ?? 1,
+      positionX: row.image_position_x ?? 50,
+      positionY: row.image_position_y ?? 50,
+    }),
     whatsappNumber: row.whatsapp_number ?? '',
     specialties: row.specialties ?? [],
     featured: row.featured,
@@ -119,6 +138,11 @@ function mapAdminProduct(row: DatabaseProductRow): AdminProduct {
     fullDescription: row.full_description ?? '',
     imageUrl: row.image_url ?? '',
     imagePath: row.image_path ?? '',
+    imagePosition: normalizeImagePosition({
+      zoom: row.image_zoom ?? 1,
+      positionX: row.image_position_x ?? 50,
+      positionY: row.image_position_y ?? 50,
+    }),
     featured: row.featured,
     active: row.active,
     displayOrder: row.display_order,
@@ -195,6 +219,9 @@ export const stylesService = {
       full_description: style.fullDescription.trim() || null,
       image_url: style.imageUrl || null,
       image_path: style.imagePath || null,
+      image_zoom: style.imagePosition.zoom,
+      image_position_x: style.imagePosition.positionX,
+      image_position_y: style.imagePosition.positionY,
       tags: style.tags,
       featured: style.featured,
       active: style.active,
@@ -245,6 +272,9 @@ export const professionalsService = {
       full_description: professional.fullDescription.trim() || null,
       image_url: professional.imageUrl || null,
       image_path: professional.imagePath || null,
+      image_zoom: professional.imagePosition.zoom,
+      image_position_x: professional.imagePosition.positionX,
+      image_position_y: professional.imagePosition.positionY,
       whatsapp_number: professional.whatsappNumber.replace(/\D/g, '') || null,
       specialties: professional.specialties,
       featured: professional.featured,
@@ -295,6 +325,9 @@ export const productsService = {
       full_description: product.fullDescription.trim() || null,
       image_url: product.imageUrl || null,
       image_path: product.imagePath || null,
+      image_zoom: product.imagePosition.zoom,
+      image_position_x: product.imagePosition.positionX,
+      image_position_y: product.imagePosition.positionY,
       featured: product.featured,
       active: product.active,
       display_order: product.displayOrder,
@@ -322,6 +355,14 @@ export const settingsService = {
       if (row.key in settings) Object.assign(settings, { [row.key]: row.value })
     }
     if (!settings.heroImageUrl.trim()) settings.heroImageUrl = fallbackSiteSettings.heroImageUrl
+    const heroPosition = normalizeImagePosition({ zoom: settings.heroImageZoom, positionX: settings.heroImagePositionX, positionY: settings.heroImagePositionY })
+    settings.heroImageZoom = heroPosition.zoom
+    settings.heroImagePositionX = heroPosition.positionX
+    settings.heroImagePositionY = heroPosition.positionY
+    const footerPosition = normalizeImagePosition({ zoom: settings.footerImageZoom, positionX: settings.footerImagePositionX, positionY: settings.footerImagePositionY })
+    settings.footerImageZoom = footerPosition.zoom
+    settings.footerImagePositionX = footerPosition.positionX
+    settings.footerImagePositionY = footerPosition.positionY
     return settings
   },
   async save(values: Partial<SiteSettings>) {
@@ -371,6 +412,7 @@ function toPublicStyle(style: AdminStyle, categories: Category[]): Style | null 
     fullDescription: style.fullDescription,
     image: style.imageUrl || '/images/styles/corte-bob.svg',
     imageAlt: `Referencia visual para ${style.name}`,
+    imagePosition: style.imagePosition,
     tags: style.tags,
     featured: style.featured,
     order: style.displayOrder,
@@ -392,6 +434,7 @@ function toPublicProfessional(professional: AdminProfessional): Professional {
     fullDescription: professional.fullDescription,
     image: professional.imageUrl || '/images/professionals/marilyn.svg',
     imageAlt: `Fotografía de ${professional.name}`,
+    imagePosition: professional.imagePosition,
     whatsappNumber: professional.whatsappNumber,
     active: professional.active,
     featured: professional.featured,
@@ -412,6 +455,7 @@ function toPublicProduct(product: AdminProduct): Product {
     fullDescription: product.fullDescription,
     image: product.imageUrl || '/images/products/tratamiento.svg',
     imageAlt: `Presentación de ${product.name}`,
+    imagePosition: product.imagePosition,
     featured: product.featured,
     active: product.active,
     displayOrder: product.displayOrder,

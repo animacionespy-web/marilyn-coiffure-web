@@ -7,9 +7,11 @@ import { removeSiteImage } from '../../services/storage'
 import type { AdminProfessional, AdminStyle } from '../../types/admin'
 import { createSlug, validateInternationalWhatsapp } from '../../utils/admin'
 import { useDocumentMeta } from '../../hooks/useDocumentMeta'
+import { DEFAULT_IMAGE_POSITION } from '../../types/image'
+import { ImagePositionEditor } from '../components/ImagePositionEditor'
 
 const emptyProfessional: AdminProfessional = {
-  id: '', name: '', slug: '', role: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', whatsappNumber: '', specialties: [], featured: false, active: true, displayOrder: 0, availabilityNote: '', instagramUrl: '', styleIds: [],
+  id: '', name: '', slug: '', role: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION }, whatsappNumber: '', specialties: [], featured: false, active: true, displayOrder: 0, availabilityNote: '', instagramUrl: '', styleIds: [],
 }
 
 export function AdminProfessionalsPage() {
@@ -79,7 +81,7 @@ export function AdminProfessionalsPage() {
         <label>Número de WhatsApp<input inputMode="numeric" placeholder="595XXXXXXXXX" value={editing.whatsappNumber} onChange={(event) => update('whatsappNumber', event.target.value.replace(/\D/g, ''))} /><small>Formato internacional, sin espacios ni signo +. Puede quedar vacío.</small></label>
         <label>Instagram opcional<input type="url" value={editing.instagramUrl} onChange={(event) => update('instagramUrl', event.target.value)} /></label>
         <label className="admin-form__wide">Nota de atención<textarea rows={2} value={editing.availabilityNote} onChange={(event) => update('availabilityNote', event.target.value)} /></label>
-        <div className="admin-form__wide"><ImageUploadField folder="professionals" label="Fotografía" imageUrl={editing.imageUrl} onUploaded={(result) => { if (!previousImagePath) setPreviousImagePath(editing.imagePath); setEditing((current) => current ? { ...current, imageUrl: result.publicUrl, imagePath: result.path } : current) }} /></div>
+        <div className="admin-form__wide"><ImageUploadField folder="professionals" label="Fotografía" imageUrl={editing.imageUrl} onUploaded={(result) => { if (!previousImagePath) setPreviousImagePath(editing.imagePath); setEditing((current) => current ? { ...current, imageUrl: result.publicUrl, imagePath: result.path, imagePosition: { ...DEFAULT_IMAGE_POSITION } } : current) }} /><ImagePositionEditor imageUrl={editing.imageUrl} imageAlt={`Vista previa de ${editing.name || 'profesional'}`} value={editing.imagePosition} previews={[{ label: 'Tarjeta de profesional', aspectRatio: '4 / 5' }]} onSave={(imagePosition) => update('imagePosition', imagePosition)} /></div>
         <fieldset className="admin-form__wide admin-checkbox-grid"><legend>Estilos relacionados</legend>{styles.map((style) => <label className="admin-check" key={style.id}><input type="checkbox" checked={editing.styleIds.includes(style.id)} onChange={(event) => update('styleIds', event.target.checked ? [...editing.styleIds, style.id] : editing.styleIds.filter((id) => id !== style.id))} />{style.name}</label>)}</fieldset>
         <label className="admin-check"><input type="checkbox" checked={editing.active} onChange={(event) => update('active', event.target.checked)} />Visible en la web</label><label className="admin-check"><input type="checkbox" checked={editing.featured} onChange={(event) => update('featured', event.target.checked)} />Profesional destacada</label>
         {error && <p className="admin-field-error admin-form__wide" role="alert">{error}</p>}

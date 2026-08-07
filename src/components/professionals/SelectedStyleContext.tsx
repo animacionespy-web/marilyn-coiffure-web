@@ -1,4 +1,5 @@
 import type { Style } from '../../types/style'
+import { PositionedImage } from '../PositionedImage'
 
 interface SelectedStyleContextProps {
   style: Style
@@ -8,7 +9,7 @@ interface SelectedStyleContextProps {
 export function SelectedStyleContext({ style, onContinueWithoutStyle }: SelectedStyleContextProps) {
   return (
     <aside className="professional-style-context" aria-labelledby="professional-style-title">
-      <img src={style.image} alt="" width="160" height="190" />
+      <PositionedImage src={style.image} alt="" width="160" height="190" position={style.imagePosition} />
       <div>
         <p className="eyebrow">Tu selección anterior</p>
         <h2 id="professional-style-title">Estilo seleccionado: {style.name}</h2>

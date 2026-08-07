@@ -98,7 +98,7 @@ export function ProfessionalsPage() {
       <ProfessionalsHero />
       <section className="professionals-content section" aria-labelledby="professionals-list-title" ref={selectionSectionRef}>
         <div className="container">
-          {selectedStyle && <CompactSelectionBar eyebrow="Estilo elegido" title={selectedStyle.name} image={selectedStyle.image} imageAlt={selectedStyle.imageAlt} changeHref="/estilos" onRemove={removeStyle} />}
+          {selectedStyle && <CompactSelectionBar eyebrow="Estilo elegido" title={selectedStyle.name} image={selectedStyle.image} imageAlt={selectedStyle.imageAlt} imagePosition={selectedStyle.imagePosition} changeHref="/estilos" onRemove={removeStyle} />}
           <div className="professionals-list-heading"><div><h2 id="professionals-list-title">Elegí una profesional</h2></div><p aria-live="polite">{filteredProfessionals.length} {filteredProfessionals.length === 1 ? 'profesional disponible' : 'profesionales disponibles'}</p></div>
           <div className="professionals-toolbar"><ProfessionalSearch value={query} onChange={setQuery} onClear={() => setQuery('')} /><ProfessionalFilters selectedFilter={selectedFilter} onChange={setSelectedFilter} /></div>
           {filteredProfessionals.length === 0 ? <PublicContentState loading={loading} error={error} empty={professionals.length === 0 ? 'No hay profesionales publicadas todavía.' : 'No encontramos profesionales con esos criterios.'} onRetry={retry} /> : <ProfessionalsGrid professionals={filteredProfessionals} selectedProfessionalId={selectedProfessional?.id} selectedStyleId={selectedStyle?.id} isAnySelected={isAnyProfessionalSelected} onSelect={selectProfessional} onSelectAny={selectAnyProfessional} />}

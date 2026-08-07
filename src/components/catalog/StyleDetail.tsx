@@ -1,4 +1,5 @@
 import type { Style } from '../../types/style'
+import { PositionedImage } from '../PositionedImage'
 
 interface StyleDetailProps {
   style: Style
@@ -9,7 +10,7 @@ export function StyleDetail({ style, onSelect }: StyleDetailProps) {
   return (
     <article className="style-detail">
       <div className="style-detail__image">
-        <img src={style.image} alt={style.imageAlt} width="800" height="960" />
+        <PositionedImage src={style.image} alt={style.imageAlt} width="800" height="960" position={style.imagePosition} />
         <span>Imagen de referencia</span>
       </div>
       <div className="style-detail__content">

@@ -5,6 +5,8 @@ import { validateInternationalWhatsapp } from '../../utils/admin'
 import { removeSiteImage } from '../../services/storage'
 import { AdminError, AdminLoading } from './AdminFeedback'
 import { ImageUploadField } from './ImageUploadField'
+import { ImagePositionEditor } from './ImagePositionEditor'
+import { DEFAULT_IMAGE_POSITION } from '../../types/image'
 
 export function SiteSettingsForm({ section }: { section: 'content' | 'configuration' }) {
   const [settings, setSettings] = useState<SiteSettings | null>(null)
@@ -15,6 +17,7 @@ export function SiteSettingsForm({ section }: { section: 'content' | 'configurat
   const [message, setMessage] = useState('')
   const [request, setRequest] = useState(0)
   const [previousHeroImagePath, setPreviousHeroImagePath] = useState('')
+  const [previousFooterImagePath, setPreviousFooterImagePath] = useState('')
 
   useEffect(() => { setLoading(true); settingsService.get().then(setSettings).catch((loadError: unknown) => setError(loadError instanceof Error ? loadError.message : 'No pudimos cargar el contenido.')).finally(() => setLoading(false)) }, [request])
   useEffect(() => { const warn = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = '' } }; window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn) }, [dirty])
@@ -27,11 +30,14 @@ export function SiteSettingsForm({ section }: { section: 'content' | 'configurat
     setSaving(true); setError(''); setMessage('')
     try {
       const values = section === 'content' ? {
-        heroTitle: settings.heroTitle, heroDescription: settings.heroDescription, heroImageUrl: settings.heroImageUrl, heroImagePath: settings.heroImagePath, aboutTitle: settings.aboutTitle, aboutText: settings.aboutText, ctaTitle: settings.ctaTitle, ctaDescription: settings.ctaDescription, formDisclaimer: settings.formDisclaimer, specialties: settings.specialties,
+        heroTitle: settings.heroTitle, heroDescription: settings.heroDescription, heroImageUrl: settings.heroImageUrl, heroImagePath: settings.heroImagePath, heroImageZoom: settings.heroImageZoom, heroImagePositionX: settings.heroImagePositionX, heroImagePositionY: settings.heroImagePositionY, footerImageUrl: settings.footerImageUrl, footerImagePath: settings.footerImagePath, footerImageZoom: settings.footerImageZoom, footerImagePositionX: settings.footerImagePositionX, footerImagePositionY: settings.footerImagePositionY, aboutTitle: settings.aboutTitle, aboutText: settings.aboutText, ctaTitle: settings.ctaTitle, ctaDescription: settings.ctaDescription, formDisclaimer: settings.formDisclaimer, specialties: settings.specialties,
       } : {
         salonName: settings.salonName, generalWhatsappNumber: settings.generalWhatsappNumber.replace(/\D/g, ''), domain: settings.domain, instagramUrl: settings.instagramUrl, facebookUrl: settings.facebookUrl, address: settings.address, openingHours: settings.openingHours, seoTitle: settings.seoTitle, seoDescription: settings.seoDescription,
       }
-      await settingsService.save(values); if (previousHeroImagePath && previousHeroImagePath !== settings.heroImagePath) await removeSiteImage(previousHeroImagePath); setPreviousHeroImagePath(''); setDirty(false); setMessage('Cambios guardados correctamente.')
+      await settingsService.save(values)
+      if (previousHeroImagePath && previousHeroImagePath !== settings.heroImagePath) await removeSiteImage(previousHeroImagePath)
+      if (previousFooterImagePath && previousFooterImagePath !== settings.footerImagePath) await removeSiteImage(previousFooterImagePath)
+      setPreviousHeroImagePath(''); setPreviousFooterImagePath(''); setDirty(false); setMessage('Cambios guardados correctamente.')
     } catch (saveError) { setError(saveError instanceof Error ? saveError.message : 'No se pudieron guardar los cambios.') }
     finally { setSaving(false) }
   }
@@ -45,10 +51,16 @@ export function SiteSettingsForm({ section }: { section: 'content' | 'configurat
         <div className="admin-form-section admin-form__wide"><p className="eyebrow">Portada</p><h2>Presentación principal</h2></div>
         <label className="admin-form__wide">Título principal<input value={settings.heroTitle} onChange={(event) => update('heroTitle', event.target.value)} /></label>
         <label className="admin-form__wide">Texto secundario<textarea rows={3} value={settings.heroDescription} onChange={(event) => update('heroDescription', event.target.value)} /></label>
-        <div className="admin-form__wide"><ImageUploadField folder="home" label="Imagen principal de la dueña" imageUrl={settings.heroImageUrl} onUploaded={(result) => { if (!previousHeroImagePath) setPreviousHeroImagePath(settings.heroImagePath); setDirty(true); setSettings((current) => current ? { ...current, heroImageUrl: result.publicUrl, heroImagePath: result.path } : current) }} /></div>
+        <div className="admin-form__wide"><ImageUploadField folder="home" label="Imagen principal de la dueña" imageUrl={settings.heroImageUrl} onUploaded={(result) => { if (!previousHeroImagePath) setPreviousHeroImagePath(settings.heroImagePath); setDirty(true); setSettings((current) => current ? { ...current, heroImageUrl: result.publicUrl, heroImagePath: result.path, heroImageZoom: 1, heroImagePositionX: 50, heroImagePositionY: 50 } : current) }} /><ImagePositionEditor imageUrl={settings.heroImageUrl} imageAlt="Vista previa de la portada" value={{ zoom: settings.heroImageZoom, positionX: settings.heroImagePositionX, positionY: settings.heroImagePositionY }} previews={[{ label: 'Portada en PC', aspectRatio: '4 / 5' }, { label: 'Portada en celular', aspectRatio: '3 / 4' }]} onSave={(position) => { update('heroImageZoom', position.zoom); update('heroImagePositionX', position.positionX); update('heroImagePositionY', position.positionY) }} /></div>
         <div className="admin-form-section admin-form__wide"><p className="eyebrow">Salón</p><h2>Presentación y llamada a la acción</h2></div>
         <label className="admin-form__wide">Título sobre el salón<input value={settings.aboutTitle} onChange={(event) => update('aboutTitle', event.target.value)} /></label>
         <label className="admin-form__wide">Texto sobre el salón<textarea rows={6} value={settings.aboutText} onChange={(event) => update('aboutText', event.target.value)} /></label>
+        <div className="admin-form-section admin-form__wide"><p className="eyebrow">Imagen final del sitio</p><h2>Fotografía del bloque sobre el salón</h2><p>Reemplaza el monograma MC. Si la quitás, el fallback elegante se mantiene.</p></div>
+        <div className="admin-form__wide">
+          <ImageUploadField folder="home" label="Imagen final" imageUrl={settings.footerImageUrl} onUploaded={(result) => { if (!previousFooterImagePath) setPreviousFooterImagePath(settings.footerImagePath); setDirty(true); setSettings((current) => current ? { ...current, footerImageUrl: result.publicUrl, footerImagePath: result.path, footerImageZoom: 1, footerImagePositionX: 50, footerImagePositionY: 50 } : current) }} />
+          {settings.footerImageUrl && <div className="admin-inline-actions"><button className="admin-button admin-button--secondary" type="button" onClick={() => { if (!previousFooterImagePath) setPreviousFooterImagePath(settings.footerImagePath); setDirty(true); setSettings((current) => current ? { ...current, footerImageUrl: '', footerImagePath: '', footerImageZoom: DEFAULT_IMAGE_POSITION.zoom, footerImagePositionX: DEFAULT_IMAGE_POSITION.positionX, footerImagePositionY: DEFAULT_IMAGE_POSITION.positionY } : current) }}>Quitar imagen final</button></div>}
+          <ImagePositionEditor imageUrl={settings.footerImageUrl} imageAlt="Vista previa de la imagen final" value={{ zoom: settings.footerImageZoom, positionX: settings.footerImagePositionX, positionY: settings.footerImagePositionY }} previews={[{ label: 'Bloque final', aspectRatio: '21 / 22' }]} onSave={(position) => { update('footerImageZoom', position.zoom); update('footerImagePositionX', position.positionX); update('footerImagePositionY', position.positionY) }} />
+        </div>
         <label>Título de llamada a la acción<input value={settings.ctaTitle} onChange={(event) => update('ctaTitle', event.target.value)} /></label>
         <label>Texto de llamada a la acción<textarea rows={3} value={settings.ctaDescription} onChange={(event) => update('ctaDescription', event.target.value)} /></label>
         <label className="admin-form__wide">Aviso del formulario<textarea rows={3} value={settings.formDisclaimer} onChange={(event) => update('formDisclaimer', event.target.value)} /></label>

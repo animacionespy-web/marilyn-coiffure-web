@@ -1,3 +1,5 @@
+import type { ImagePosition } from './image'
+
 export type ProfessionalSpecialty =
   | 'Coloración'
   | 'Balayage'
@@ -29,6 +31,7 @@ export interface Professional {
   fullDescription: string
   image: string
   imageAlt: string
+  imagePosition?: ImagePosition
   whatsappNumber: string
   active: boolean
   featured: boolean

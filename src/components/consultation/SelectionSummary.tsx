@@ -1,4 +1,5 @@
 import type { ConsultationSelection } from '../../types/consultation'
+import { PositionedImage } from '../PositionedImage'
 
 interface SelectionSummaryProps {
   selection: ConsultationSelection
@@ -17,12 +18,12 @@ export function SelectionSummary({ selection }: SelectionSummaryProps) {
     <section className="consultation-selection" aria-labelledby="consultation-selection-title">
       <div className="consultation-selection__visuals">
         {selection.style ? (
-          <img src={selection.style.image} alt={selection.style.imageAlt} width="170" height="200" />
+          <PositionedImage src={selection.style.image} alt={selection.style.imageAlt} width="170" height="200" position={selection.style.imagePosition} />
         ) : (
           <div className="consultation-selection__placeholder" aria-hidden="true">✦</div>
         )}
         {selection.professional && !selection.anyProfessional && (
-          <img src={selection.professional.image} alt="" width="170" height="200" />
+          <PositionedImage src={selection.professional.image} alt="" width="170" height="200" position={selection.professional.imagePosition} />
         )}
       </div>
       <div className="consultation-selection__details">

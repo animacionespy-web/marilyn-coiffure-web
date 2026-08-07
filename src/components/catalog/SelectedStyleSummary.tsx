@@ -1,4 +1,5 @@
 import type { Style } from '../../types/style'
+import { PositionedImage } from '../PositionedImage'
 
 interface SelectedStyleSummaryProps {
   style: Style
@@ -8,7 +9,7 @@ export function SelectedStyleSummary({ style }: SelectedStyleSummaryProps) {
   return (
     <section className="selected-style" id="estilo-seleccionado" aria-live="polite" aria-labelledby="selected-style-title">
       <div className="selected-style__image">
-        <img src={style.image} alt={style.imageAlt} width="640" height="760" />
+        <PositionedImage src={style.image} alt={style.imageAlt} width="640" height="760" position={style.imagePosition} />
       </div>
       <div>
         <p className="eyebrow">Selección guardada temporalmente</p>

@@ -1,4 +1,5 @@
 import type { Style } from '../../types/style'
+import { PositionedImage } from '../PositionedImage'
 
 interface StyleCardProps {
   style: Style
@@ -11,7 +12,7 @@ export function StyleCard({ style, isSelected, isRecommended, onSelect }: StyleC
   return (
     <article className={`catalog-card ${isSelected ? 'is-selected' : ''}`}>
       <a className="catalog-card__image" href={`/estilos/${style.slug}`} aria-label={`Ver detalles de ${style.name}`}>
-        <img src={style.image} alt={style.imageAlt} loading="lazy" width="640" height="760" />
+        <PositionedImage src={style.image} alt={style.imageAlt} loading="lazy" width="640" height="760" position={style.imagePosition} />
         {isRecommended && <span>Recomendado con esta profesional</span>}
       </a>
       <div className="catalog-card__body">

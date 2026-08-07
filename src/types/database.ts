@@ -19,6 +19,9 @@ export interface DatabaseStyleRow {
   full_description: string | null
   image_url: string | null
   image_path: string | null
+  image_zoom: number | null
+  image_position_x: number | null
+  image_position_y: number | null
   tags: string[] | null
   featured: boolean
   active: boolean
@@ -36,6 +39,9 @@ export interface DatabaseProfessionalRow {
   full_description: string | null
   image_url: string | null
   image_path: string | null
+  image_zoom: number | null
+  image_position_x: number | null
+  image_position_y: number | null
   whatsapp_number: string | null
   specialties: string[] | null
   featured: boolean
@@ -54,6 +60,9 @@ export interface DatabaseProductRow {
   full_description: string | null
   image_url: string | null
   image_path: string | null
+  image_zoom: number | null
+  image_position_x: number | null
+  image_position_y: number | null
   featured: boolean
   active: boolean
   display_order: number

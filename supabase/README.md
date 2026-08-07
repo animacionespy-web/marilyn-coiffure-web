@@ -24,6 +24,12 @@ La migración también crea el bucket público `site-images`, limita cada archiv
 
 Después de la migración inicial, ejecutá manualmente `migrations/202608060001_add_products.sql` para habilitar la administración de Productos. Esta migración es adicional, no destructiva y no se ejecuta automáticamente en producción.
 
+### Ajuste de encuadre de imágenes
+
+Después de habilitar Productos, ejecutá manualmente `migrations/202608070001_add_image_positioning.sql`. La migración agrega, sin recortar ni reemplazar archivos, `image_zoom`, `image_position_x` e `image_position_y` a estilos, profesionales y productos. También incorpora los valores de portada e imagen final en `site_settings`. El zoom admite de 1 a 2.5 y las posiciones de 0 a 100.
+
+En el panel, **Ajustar encuadre** actualiza la vista previa localmente y recién persiste los valores al guardar el formulario principal. La imagen final se administra en `/admin/contenido`, dentro de **Imagen final del sitio**. Si se elimina, la web vuelve a mostrar el monograma MC.
+
 ## 4. Cargar los datos iniciales
 
 Ejecutá `seed.sql` desde SQL Editor. Usa UUID conocidos, `upsert` y `on conflict`, por lo que puede repetirse sin duplicar registros. Los textos, nombres e imágenes son provisionales. No carga números inventados.

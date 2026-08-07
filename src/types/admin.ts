@@ -1,3 +1,5 @@
+import type { ImagePosition } from './image'
+
 export type AdminRole = 'admin'
 
 export interface Profile {
@@ -30,6 +32,7 @@ export interface AdminStyle {
   fullDescription: string
   imageUrl: string
   imagePath: string
+  imagePosition: ImagePosition
   tags: string[]
   featured: boolean
   active: boolean
@@ -48,6 +51,7 @@ export interface AdminProfessional {
   fullDescription: string
   imageUrl: string
   imagePath: string
+  imagePosition: ImagePosition
   whatsappNumber: string
   specialties: string[]
   featured: boolean
@@ -67,6 +71,7 @@ export interface AdminProduct {
   fullDescription: string
   imageUrl: string
   imagePath: string
+  imagePosition: ImagePosition
   featured: boolean
   active: boolean
   displayOrder: number
@@ -84,6 +89,14 @@ export interface SiteSettings {
   heroDescription: string
   heroImageUrl: string
   heroImagePath: string
+  heroImageZoom: number
+  heroImagePositionX: number
+  heroImagePositionY: number
+  footerImageUrl: string
+  footerImagePath: string
+  footerImageZoom: number
+  footerImagePositionX: number
+  footerImagePositionY: number
   aboutTitle: string
   aboutText: string
   ctaTitle: string

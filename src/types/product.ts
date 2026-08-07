@@ -1,3 +1,5 @@
+import type { ImagePosition } from './image'
+
 export type ProductCategory =
   | 'Shampoo'
   | 'Acondicionador'
@@ -15,6 +17,7 @@ export interface Product {
   fullDescription: string
   image: string
   imageAlt: string
+  imagePosition?: ImagePosition
   featured: boolean
   active: boolean
   displayOrder: number
