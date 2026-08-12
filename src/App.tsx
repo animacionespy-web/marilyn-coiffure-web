@@ -4,6 +4,7 @@ import { AvailabilityCTA } from './components/AvailabilityCTA'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { Hero } from './components/Hero'
+import { LocationSection } from './components/LocationSection'
 import { ProfessionalsPreview } from './components/ProfessionalsPreview'
 import { ProductsPreview } from './components/ProductsPreview'
 import { SpecialtyHighlights } from './components/SpecialtyHighlights'
@@ -29,6 +30,7 @@ function HomePage() {
       <ProfessionalsPreview />
       <ProductsPreview />
       <SpecialtyHighlights />
+      <LocationSection />
       <AboutSection />
       <AvailabilityCTA />
     </main>

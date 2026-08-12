@@ -102,6 +102,9 @@ export interface SiteSettings {
   ctaTitle: string
   ctaDescription: string
   formDisclaimer: string
+  locationMapsUrl: string
+  locationEmbedUrl: string
+  locationAddress: string
   address: string
   openingHours: string
   seoTitle: string

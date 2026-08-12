@@ -30,6 +30,10 @@ Después de habilitar Productos, ejecutá manualmente `migrations/202608070001_a
 
 En el panel, **Ajustar encuadre** actualiza la vista previa localmente y recién persiste los valores al guardar el formulario principal. La imagen final se administra en `/admin/contenido`, dentro de **Imagen final del sitio**. Si se elimina, la web vuelve a mostrar el monograma MC.
 
+### Ubicación del salón
+
+Ejecutá manualmente `migrations/202608120001_add_location_settings.sql` para habilitar la lectura pública y edición desde `/admin/contenido` del enlace de Google Maps, la URL embed y la dirección visible. Es una migración aditiva e idempotente; no modifica las tablas de estilos, profesionales ni productos.
+
 ## 4. Cargar los datos iniciales
 
 Ejecutá `seed.sql` desde SQL Editor. Usa UUID conocidos, `upsert` y `on conflict`, por lo que puede repetirse sin duplicar registros. Los textos, nombres e imágenes son provisionales. No carga números inventados.

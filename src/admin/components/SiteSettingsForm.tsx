@@ -7,6 +7,7 @@ import { AdminError, AdminLoading } from './AdminFeedback'
 import { ImageUploadField } from './ImageUploadField'
 import { ImagePositionEditor } from './ImagePositionEditor'
 import { DEFAULT_IMAGE_POSITION } from '../../types/image'
+import { LocationMap } from '../../components/LocationMap'
 
 export function SiteSettingsForm({ section }: { section: 'content' | 'configuration' }) {
   const [settings, setSettings] = useState<SiteSettings | null>(null)
@@ -30,7 +31,7 @@ export function SiteSettingsForm({ section }: { section: 'content' | 'configurat
     setSaving(true); setError(''); setMessage('')
     try {
       const values = section === 'content' ? {
-        heroTitle: settings.heroTitle, heroDescription: settings.heroDescription, heroImageUrl: settings.heroImageUrl, heroImagePath: settings.heroImagePath, heroImageZoom: settings.heroImageZoom, heroImagePositionX: settings.heroImagePositionX, heroImagePositionY: settings.heroImagePositionY, footerImageUrl: settings.footerImageUrl, footerImagePath: settings.footerImagePath, footerImageZoom: settings.footerImageZoom, footerImagePositionX: settings.footerImagePositionX, footerImagePositionY: settings.footerImagePositionY, aboutTitle: settings.aboutTitle, aboutText: settings.aboutText, ctaTitle: settings.ctaTitle, ctaDescription: settings.ctaDescription, formDisclaimer: settings.formDisclaimer, specialties: settings.specialties,
+        heroTitle: settings.heroTitle, heroDescription: settings.heroDescription, heroImageUrl: settings.heroImageUrl, heroImagePath: settings.heroImagePath, heroImageZoom: settings.heroImageZoom, heroImagePositionX: settings.heroImagePositionX, heroImagePositionY: settings.heroImagePositionY, footerImageUrl: settings.footerImageUrl, footerImagePath: settings.footerImagePath, footerImageZoom: settings.footerImageZoom, footerImagePositionX: settings.footerImagePositionX, footerImagePositionY: settings.footerImagePositionY, aboutTitle: settings.aboutTitle, aboutText: settings.aboutText, ctaTitle: settings.ctaTitle, ctaDescription: settings.ctaDescription, formDisclaimer: settings.formDisclaimer, specialties: settings.specialties, locationMapsUrl: settings.locationMapsUrl, locationEmbedUrl: settings.locationEmbedUrl, locationAddress: settings.locationAddress,
       } : {
         salonName: settings.salonName, generalWhatsappNumber: settings.generalWhatsappNumber.replace(/\D/g, ''), domain: settings.domain, instagramUrl: settings.instagramUrl, facebookUrl: settings.facebookUrl, address: settings.address, openingHours: settings.openingHours, seoTitle: settings.seoTitle, seoDescription: settings.seoDescription,
       }
@@ -64,6 +65,11 @@ export function SiteSettingsForm({ section }: { section: 'content' | 'configurat
         <label>Título de llamada a la acción<input value={settings.ctaTitle} onChange={(event) => update('ctaTitle', event.target.value)} /></label>
         <label>Texto de llamada a la acción<textarea rows={3} value={settings.ctaDescription} onChange={(event) => update('ctaDescription', event.target.value)} /></label>
         <label className="admin-form__wide">Aviso del formulario<textarea rows={3} value={settings.formDisclaimer} onChange={(event) => update('formDisclaimer', event.target.value)} /></label>
+        <div className="admin-form-section admin-form__wide"><p className="eyebrow">Ubicación</p><h2>Ubicación del local</h2><p>El enlace abre Google Maps y la URL embed controla la vista previa pública.</p></div>
+        <label className="admin-form__wide">Enlace Google Maps<input type="url" placeholder="https://maps.app.goo.gl/..." value={settings.locationMapsUrl} onChange={(event) => update('locationMapsUrl', event.target.value)} /></label>
+        <label className="admin-form__wide">URL de mapa embebido / Embed URL<input type="url" placeholder="https://www.google.com/maps?...&amp;output=embed" value={settings.locationEmbedUrl} onChange={(event) => update('locationEmbedUrl', event.target.value)} /><small>Por seguridad, se aceptan únicamente URLs HTTPS oficiales de Google Maps aptas para iframe.</small></label>
+        <label className="admin-form__wide">Dirección visible opcional<input value={settings.locationAddress} onChange={(event) => update('locationAddress', event.target.value)} /></label>
+        <div className="admin-location-preview admin-form__wide"><p className="eyebrow">Vista previa del mapa</p><LocationMap embedUrl={settings.locationEmbedUrl} mapsUrl={settings.locationMapsUrl} title="Vista previa de la ubicación del salón" /></div>
         <fieldset className="admin-form__wide admin-specialties-editor"><legend>Textos de especialidades</legend>{settings.specialties.map((item, index) => <div key={`${item.title}-${index}`}><label>Título<input value={item.title} onChange={(event) => update('specialties', settings.specialties.map((current, itemIndex) => itemIndex === index ? { ...current, title: event.target.value } : current))} /></label><label>Descripción<input value={item.description} onChange={(event) => update('specialties', settings.specialties.map((current, itemIndex) => itemIndex === index ? { ...current, description: event.target.value } : current))} /></label></div>)}</fieldset>
         <aside className="admin-content-preview admin-form__wide"><p className="eyebrow">Vista previa simple</p><h2>{settings.heroTitle || 'Título principal'}</h2><p>{settings.heroDescription || 'Texto secundario'}</p></aside>
       </> : <>
