@@ -26,12 +26,12 @@ function HomePage() {
   return (
     <main id="contenido-principal">
       <Hero />
+      <AboutSection />
+      <SpecialtyHighlights />
       <StylesPreview />
       <ProfessionalsPreview />
       <ProductsPreview />
-      <SpecialtyHighlights />
       <LocationSection />
-      <AboutSection />
       <AvailabilityCTA />
     </main>
   )

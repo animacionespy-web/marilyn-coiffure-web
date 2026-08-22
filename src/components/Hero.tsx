@@ -10,7 +10,7 @@ export function Hero() {
       <div className="container hero__grid">
         <div className="hero__content">
           <div className="hero__intro">
-            <p className="eyebrow">{siteContent.hero.eyebrow}</p>
+            <p className="eyebrow">Marilyn Coiffure · Villarrica</p>
             <h1 id="hero-title">{settings.heroTitle}</h1>
           </div>
           <div className="hero__details">
@@ -27,7 +27,7 @@ export function Hero() {
             </div>
             <div className="hero__signature" aria-hidden="true">
               <span />
-              Cuidado que se nota
+              Belleza que evoluciona con vos
             </div>
           </div>
         </div>

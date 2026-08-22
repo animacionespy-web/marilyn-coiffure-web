@@ -9,15 +9,15 @@ export const siteContent = {
     { label: 'Contacto', href: '/#contacto' },
   ],
   actions: {
-    availability: { label: 'Consultar disponibilidad', href: '/consulta' },
+    availability: { label: 'Reservar turno', href: '/consulta' },
     styles: { label: 'Ver estilos', href: '/estilos' },
   },
   hero: {
     eyebrow: 'Belleza · cuidado · estilo',
-    title: 'Realzá tu belleza con un estilo único',
+    title: 'Belleza que evoluciona con vos',
     description:
-      'Coloración, peinados y cuidado capilar pensados para acompañar tu esencia con atención dedicada y resultados que se sienten propios.',
-    mobileDescription: 'Coloración, peinados y cuidado capilar con atención personalizada.',
+      'El mismo trato cercano de siempre, con técnicas que evolucionan y una mirada profesional para cuidar cada etapa de tu cabello.',
+    mobileDescription: 'El mismo trato cercano de siempre, con la técnica de hoy.',
     imagePlaceholder: 'Espacio reservado para la fotografía de la dueña',
   },
   specialties: [
@@ -43,13 +43,13 @@ export const siteContent = {
     },
   ],
   about: {
-    eyebrow: 'Una experiencia personal',
-    title: 'Tu cabello, tu momento, tu mejor versión',
+    eyebrow: 'Nuestra esencia',
+    title: 'Un salón que creció con sus clientas.',
     paragraphs: [
-      'En Marilyn Coiffure cada atención comienza con una conversación. Buscamos comprender lo que te gusta, cómo vivís tu cabello y qué resultado querés sentir.',
-      'La belleza y el cuidado capilar se encuentran en un ambiente sereno, con una propuesta cercana, profesional y pensada alrededor de vos.',
+      'Empezamos atendiendo a las mamás. Hoy atendemos también a sus hijas, y muchas veces las tres se sientan en la misma sala.',
+      'Esa continuidad es lo que nos define: conocemos el cabello de nuestras clientas a lo largo del tiempo, no en una sola visita. Y por eso seguimos formándonos, cambiando técnicas y actualizando lo que hacemos, sin cambiar la forma en la que tratamos a la gente.',
     ],
-    qualities: ['Atención dedicada', 'Cuidado en cada detalle', 'Estilo con identidad'],
+    qualities: ['Experiencia', 'Cercanía', 'Criterio profesional', 'Evolución'],
   },
   contact: {
     title: '¿Lista para encontrar tu próximo estilo?',

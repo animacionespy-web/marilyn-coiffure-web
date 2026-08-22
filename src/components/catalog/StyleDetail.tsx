@@ -36,7 +36,7 @@ export function StyleDetail({ style, onSelect }: StyleDetailProps) {
         </div>
         <div className="style-detail__actions">
           <button className="button button--dark" type="button" onClick={() => onSelect(style)}>
-            Elegir este estilo
+            Reservar turno
           </button>
           <a className="button button--outline" href="/estilos">
             Volver al catálogo

@@ -40,7 +40,7 @@ export function Footer() {
             <h2>Contacto</h2>
             <p>{settings.address || siteContent.contact.provisional}</p>
             {settings.openingHours && <p>{settings.openingHours}</p>}
-            <a href="/consulta">Consultar disponibilidad</a>
+            <a href="/consulta">Reservar turno</a>
           </div>
 
           <div className="site-footer__column">

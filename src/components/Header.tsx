@@ -3,6 +3,8 @@ import { siteContent } from '../data/siteContent'
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const isHome = window.location.pathname === '/'
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -13,10 +15,19 @@ export function Header() {
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [])
 
+  useEffect(() => {
+    if (!isHome) return
+
+    const updateHeader = () => setIsScrolled(window.scrollY > 36)
+    updateHeader()
+    window.addEventListener('scroll', updateHeader, { passive: true })
+    return () => window.removeEventListener('scroll', updateHeader)
+  }, [isHome])
+
   const closeMenu = () => setIsMenuOpen(false)
 
   return (
-    <header className="site-header">
+    <header className={`site-header ${isHome ? 'site-header--overlay' : ''} ${isScrolled || isMenuOpen ? 'is-solid' : ''}`}>
       <div className="container site-header__inner">
         <a className="brand" href="/" aria-label="Marilyn Coiffure, inicio">
           <img

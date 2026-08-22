@@ -8,14 +8,6 @@ export function AboutSection() {
   return (
     <section className="about section" id="salon" aria-labelledby="about-title">
       <div className="container about__grid">
-        <div aria-hidden="true">
-          <AboutImageVisual
-            imageUrl={settings.footerImageUrl}
-            imageAlt="Imagen del salón Marilyn Coiffure"
-            position={{ zoom: settings.footerImageZoom, positionX: settings.footerImagePositionX, positionY: settings.footerImagePositionY }}
-          />
-        </div>
-
         <div className="about__content">
           <p className="eyebrow">{siteContent.about.eyebrow}</p>
           <h2 id="about-title">{settings.aboutTitle}</h2>
@@ -30,6 +22,14 @@ export function AboutSection() {
               </li>
             ))}
           </ul>
+        </div>
+
+        <div className="about__visual" aria-hidden="true">
+          <AboutImageVisual
+            imageUrl={settings.footerImageUrl || '/images/home/maqueta-esencia.jpg'}
+            imageAlt="Imagen del salón Marilyn Coiffure"
+            position={{ zoom: settings.footerImageZoom, positionX: settings.footerImagePositionX, positionY: settings.footerImagePositionY }}
+          />
         </div>
       </div>
     </section>

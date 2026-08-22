@@ -11,7 +11,7 @@ import { usePublicContent } from '../hooks/usePublicContent'
 import { useDocumentMeta } from '../hooks/useDocumentMeta'
 import type { Style, StyleCategoryFilter } from '../types/style'
 import type { Professional } from '../types/professional'
-import { clearSelectedProfessional, getProfessionalSelection } from '../utils/professionalSelection'
+import { clearSelectedProfessional, getProfessionalSelection, saveAnyProfessionalSelection } from '../utils/professionalSelection'
 import { getSelectedStyleId, saveSelectedStyle } from '../utils/styleSelection'
 import { scrollToElement } from '../utils/scroll'
 
@@ -96,17 +96,9 @@ export function CatalogPage() {
 
   const selectStyle = (style: Style) => {
     saveSelectedStyle(style)
-    const hasProfessional = Boolean(selectedProfessional || isAnyProfessional)
-    if (!hasProfessional) {
-      window.location.assign(`/profesionales?estilo=${style.slug}&focus=selector`)
-      return
-    }
-    setSelectedStyle(style)
-    const params = new URLSearchParams({ seleccion: style.slug })
-    if (selectedProfessional) params.set('profesional', selectedProfessional.slug)
-    else if (isAnyProfessional) params.set('profesional', 'cualquiera')
-    window.history.replaceState(null, '', `/estilos?${params.toString()}`)
-    scrollToElement(() => summaryRef.current)
+    if (!selectedProfessional && !isAnyProfessional) saveAnyProfessionalSelection()
+    const professionalParam = selectedProfessional?.slug ?? 'cualquiera'
+    window.location.assign(`/consulta?estilo=${style.slug}&profesional=${professionalParam}`)
   }
 
   const removeProfessional = () => {

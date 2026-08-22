@@ -21,7 +21,7 @@ export function StyleCard({ style, isSelected, isRecommended, onSelect }: StyleC
         <p>{style.shortDescription}</p>
         <div className="catalog-card__actions">
           <button className="button button--dark" type="button" onClick={() => onSelect(style)}>
-            {isSelected ? '✓ Seleccionado' : 'Elegir estilo'}
+            {isSelected ? '✓ Seleccionado' : 'Reservar turno'}
           </button>
         </div>
       </div>

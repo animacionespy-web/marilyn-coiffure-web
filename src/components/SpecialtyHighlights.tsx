@@ -13,9 +13,9 @@ export function SpecialtyHighlights() {
         <div className="section-heading section-heading--split">
           <div>
             <p className="eyebrow">Servicios</p>
-            <h2 id="specialties-title">Lo esencial para cuidar tu estilo</h2>
+            <h2 id="specialties-title">Todo lo que hacemos, hecho con criterio.</h2>
           </div>
-          <p>Opciones pensadas para realzar y cuidar tu cabello.</p>
+          <p>Cada servicio empieza con una conversación y un diagnóstico profesional.</p>
         </div>
 
         <div className="specialty-grid">

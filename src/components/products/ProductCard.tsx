@@ -10,7 +10,7 @@ export function ProductCard({ product, whatsappNumber }: { product: Product; wha
       <div className="product-card__image"><PositionedImage src={product.image} alt={product.imageAlt} loading="lazy" width="640" height="760" position={product.imagePosition} /></div>
       <div className="product-card__body">
         <p>{product.category}</p>
-        <h2>{product.name}</h2>
+        <h3>{product.name}</h3>
         <span>{product.shortDescription}</span>
         {whatsappUrl
           ? <a className="button button--dark" href={whatsappUrl} target="_blank" rel="noopener noreferrer">Consultar</a>
