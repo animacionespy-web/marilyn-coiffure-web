@@ -8,6 +8,7 @@ import { ImageUploadField } from './ImageUploadField'
 import { ImagePositionEditor } from './ImagePositionEditor'
 import { DEFAULT_IMAGE_POSITION } from '../../types/image'
 import { LocationMap } from '../../components/LocationMap'
+import { HomeVisualBlocksEditor } from './HomeVisualBlocksEditor'
 
 export function SiteSettingsForm({ section }: { section: 'content' | 'configuration' }) {
   const [settings, setSettings] = useState<SiteSettings | null>(null)
@@ -19,8 +20,9 @@ export function SiteSettingsForm({ section }: { section: 'content' | 'configurat
   const [request, setRequest] = useState(0)
   const [previousHeroImagePath, setPreviousHeroImagePath] = useState('')
   const [previousFooterImagePath, setPreviousFooterImagePath] = useState('')
+  const [retiredHomeImagePaths, setRetiredHomeImagePaths] = useState<string[]>([])
 
-  useEffect(() => { setLoading(true); settingsService.get().then(setSettings).catch((loadError: unknown) => setError(loadError instanceof Error ? loadError.message : 'No pudimos cargar el contenido.')).finally(() => setLoading(false)) }, [request])
+  useEffect(() => { setLoading(true); setRetiredHomeImagePaths([]); settingsService.get().then(setSettings).catch((loadError: unknown) => setError(loadError instanceof Error ? loadError.message : 'No pudimos cargar el contenido.')).finally(() => setLoading(false)) }, [request])
   useEffect(() => { const warn = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = '' } }; window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn) }, [dirty])
 
   const update = <Key extends keyof SiteSettings>(key: Key, value: SiteSettings[Key]) => { setDirty(true); setMessage(''); setSettings((current) => current ? { ...current, [key]: value } : current) }
@@ -31,14 +33,15 @@ export function SiteSettingsForm({ section }: { section: 'content' | 'configurat
     setSaving(true); setError(''); setMessage('')
     try {
       const values = section === 'content' ? {
-        heroTitle: settings.heroTitle, heroDescription: settings.heroDescription, heroImageUrl: settings.heroImageUrl, heroImagePath: settings.heroImagePath, heroImageZoom: settings.heroImageZoom, heroImagePositionX: settings.heroImagePositionX, heroImagePositionY: settings.heroImagePositionY, footerImageUrl: settings.footerImageUrl, footerImagePath: settings.footerImagePath, footerImageZoom: settings.footerImageZoom, footerImagePositionX: settings.footerImagePositionX, footerImagePositionY: settings.footerImagePositionY, aboutTitle: settings.aboutTitle, aboutText: settings.aboutText, ctaTitle: settings.ctaTitle, ctaDescription: settings.ctaDescription, formDisclaimer: settings.formDisclaimer, specialties: settings.specialties, locationMapsUrl: settings.locationMapsUrl, locationEmbedUrl: settings.locationEmbedUrl, locationAddress: settings.locationAddress,
+        heroTitle: settings.heroTitle, heroDescription: settings.heroDescription, heroImageUrl: settings.heroImageUrl, heroImagePath: settings.heroImagePath, heroImageZoom: settings.heroImageZoom, heroImagePositionX: settings.heroImagePositionX, heroImagePositionY: settings.heroImagePositionY, footerImageUrl: settings.footerImageUrl, footerImagePath: settings.footerImagePath, footerImageZoom: settings.footerImageZoom, footerImagePositionX: settings.footerImagePositionX, footerImagePositionY: settings.footerImagePositionY, aboutTitle: settings.aboutTitle, aboutText: settings.aboutText, ctaTitle: settings.ctaTitle, ctaDescription: settings.ctaDescription, formDisclaimer: settings.formDisclaimer, specialties: settings.specialties, homeVisualBlocks: settings.homeVisualBlocks, locationMapsUrl: settings.locationMapsUrl, locationEmbedUrl: settings.locationEmbedUrl, locationAddress: settings.locationAddress,
       } : {
         salonName: settings.salonName, generalWhatsappNumber: settings.generalWhatsappNumber.replace(/\D/g, ''), domain: settings.domain, instagramUrl: settings.instagramUrl, facebookUrl: settings.facebookUrl, address: settings.address, openingHours: settings.openingHours, seoTitle: settings.seoTitle, seoDescription: settings.seoDescription,
       }
       await settingsService.save(values)
       if (previousHeroImagePath && previousHeroImagePath !== settings.heroImagePath) await removeSiteImage(previousHeroImagePath)
       if (previousFooterImagePath && previousFooterImagePath !== settings.footerImagePath) await removeSiteImage(previousFooterImagePath)
-      setPreviousHeroImagePath(''); setPreviousFooterImagePath(''); setDirty(false); setMessage('Cambios guardados correctamente.')
+      await Promise.all(Array.from(new Set(retiredHomeImagePaths)).filter(Boolean).map(removeSiteImage))
+      setPreviousHeroImagePath(''); setPreviousFooterImagePath(''); setRetiredHomeImagePaths([]); setDirty(false); setMessage('Cambios guardados correctamente.')
     } catch (saveError) { setError(saveError instanceof Error ? saveError.message : 'No se pudieron guardar los cambios.') }
     finally { setSaving(false) }
   }
@@ -53,6 +56,7 @@ export function SiteSettingsForm({ section }: { section: 'content' | 'configurat
         <label className="admin-form__wide">Título principal<input value={settings.heroTitle} onChange={(event) => update('heroTitle', event.target.value)} /></label>
         <label className="admin-form__wide">Texto secundario<textarea rows={3} value={settings.heroDescription} onChange={(event) => update('heroDescription', event.target.value)} /></label>
         <div className="admin-form__wide"><ImageUploadField folder="home" label="Imagen principal de la dueña" imageUrl={settings.heroImageUrl} imagePosition={{ zoom: settings.heroImageZoom, positionX: settings.heroImagePositionX, positionY: settings.heroImagePositionY }} onUploaded={(result) => { if (!previousHeroImagePath) setPreviousHeroImagePath(settings.heroImagePath); setDirty(true); setSettings((current) => current ? { ...current, heroImageUrl: result.publicUrl, heroImagePath: result.path, heroImageZoom: 1, heroImagePositionX: 50, heroImagePositionY: 50 } : current) }} /><ImagePositionEditor usage="hero" imageUrl={settings.heroImageUrl} imageAlt="Vista previa de la portada" value={{ zoom: settings.heroImageZoom, positionX: settings.heroImagePositionX, positionY: settings.heroImagePositionY }} onSave={(position) => { update('heroImageZoom', position.zoom); update('heroImagePositionX', position.positionX); update('heroImagePositionY', position.positionY) }} /></div>
+        <div className="admin-form__wide"><HomeVisualBlocksEditor blocks={settings.homeVisualBlocks} onChange={(homeVisualBlocks) => update('homeVisualBlocks', homeVisualBlocks)} onRetirePath={(path) => setRetiredHomeImagePaths((current) => path && !current.includes(path) ? [...current, path] : current)} /></div>
         <div className="admin-form-section admin-form__wide"><p className="eyebrow">Salón</p><h2>Presentación y llamada a la acción</h2></div>
         <label className="admin-form__wide">Título sobre el salón<input value={settings.aboutTitle} onChange={(event) => update('aboutTitle', event.target.value)} /></label>
         <label className="admin-form__wide">Texto sobre el salón<textarea rows={6} value={settings.aboutText} onChange={(event) => update('aboutText', event.target.value)} /></label>
@@ -90,7 +94,7 @@ export function SiteSettingsForm({ section }: { section: 'content' | 'configurat
       </>}
       {error && <p className="admin-field-error admin-form__wide" role="alert">{error}</p>}
       {message && <p className="admin-success admin-form__wide" role="status">{message}</p>}
-      <div className="admin-form__actions admin-form__wide"><button className="admin-button admin-button--primary" disabled={saving || !dirty}>{saving ? 'Guardando…' : 'Guardar cambios'}</button><button className="admin-button admin-button--secondary" type="button" disabled={saving || !dirty} onClick={() => { if (window.confirm('¿Querés descartar los cambios sin guardar?')) { setRequest((value) => value + 1); setDirty(false) } }}>Cancelar cambios</button></div>
+      <div className="admin-form__actions admin-form__wide"><button className="admin-button admin-button--primary" disabled={saving || !dirty}>{saving ? 'Guardando…' : 'Guardar cambios'}</button><button className="admin-button admin-button--secondary" type="button" disabled={saving || !dirty} onClick={() => { if (window.confirm('¿Querés descartar los cambios sin guardar?')) { setRetiredHomeImagePaths([]); setRequest((value) => value + 1); setDirty(false) } }}>Cancelar cambios</button></div>
     </form>
   )
 }

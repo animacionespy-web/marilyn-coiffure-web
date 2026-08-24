@@ -26,14 +26,17 @@ export function ProfessionalCard({ professional, isSelected, isRecommended, onSe
         <p className="professional-card__role">{professional.role}</p>
         <h2>{professional.name}</h2>
         <ul className="professional-card__specialties" aria-label={`Especialidades de ${professional.name}`}>{professional.specialties.slice(0, 2).map((specialty) => <li key={specialty}>{specialty}</li>)}</ul>
-        <button
-          className={`button ${isSelected ? 'button--selected' : 'button--dark'}`}
-          type="button"
-          aria-pressed={isSelected}
-          onClick={() => onSelect(professional)}
-        >
-          {isSelected ? '✓ Seleccionada' : 'Elegir profesional'}
-        </button>
+        <div className="professional-card__actions">
+          <a className="button button--outline" href={`/profesionales/${encodeURIComponent(professional.slug)}`}>Ver trabajos</a>
+          <button
+            className={`button ${isSelected ? 'button--selected' : 'button--dark'}`}
+            type="button"
+            aria-pressed={isSelected}
+            onClick={() => onSelect(professional)}
+          >
+            {isSelected ? '✓ Seleccionada' : 'Elegir profesional'}
+          </button>
+        </div>
       </div>
     </article>
   )

@@ -1,14 +1,10 @@
-const specialties = [
-  { icon: '◐', title: 'Coloración', description: 'Tonos y técnicas personalizadas.' },
-  { icon: '✂', title: 'Cortes', description: 'Formas que acompañan tu estilo.' },
-  { icon: '≈', title: 'Peinados', description: 'Acabados elegantes y naturales.' },
-  { icon: '✦', title: 'Quinceañeras', description: 'Looks especiales para un gran día.' },
-  { icon: '◇', title: 'Tratamientos', description: 'Cuidado, brillo y nutrición.' },
-] as const
+import { usePublicContent } from '../hooks/usePublicContent'
+import { PositionedImage } from './PositionedImage'
 
 export function SpecialtyHighlights() {
+  const { settings } = usePublicContent()
   return (
-    <section className="specialties section" id="servicios" aria-labelledby="specialties-title">
+    <section className="home-visual-services section" id="servicios" aria-labelledby="specialties-title">
       <div className="container">
         <div className="section-heading section-heading--split">
           <div>
@@ -18,13 +14,17 @@ export function SpecialtyHighlights() {
           <p>Cada servicio empieza con una conversación y un diagnóstico profesional.</p>
         </div>
 
-        <div className="specialty-grid">
-          {specialties.map((specialty) => (
-            <article className="specialty-card" key={specialty.title}>
-              <span className="specialty-card__icon" aria-hidden="true">{specialty.icon}</span>
-              <div>
-                <h3>{specialty.title}</h3>
-                <p>{specialty.description}</p>
+        <div className="home-visual-services__grid">
+          {settings.homeVisualBlocks.map((block, index) => (
+            <article className={`home-visual-service home-visual-service--${index + 1}`} key={block.id}>
+              <a className="home-visual-service__image" href={block.href} aria-label={`Ver ${block.title}`}>
+                <PositionedImage src={block.imageUrl} alt={`Referencia visual de ${block.title}`} loading="lazy" width="900" height="1080" position={block.imagePosition} />
+              </a>
+              <div className="home-visual-service__content">
+                <p>{block.eyebrow}</p>
+                <h3>{block.title}</h3>
+                <span>{block.text}</span>
+                <a href={block.href}>Explorar <span aria-hidden="true">→</span></a>
               </div>
             </article>
           ))}

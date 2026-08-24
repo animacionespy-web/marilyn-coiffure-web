@@ -12,6 +12,7 @@ import { StylesPreview } from './components/StylesPreview'
 import { CatalogPage } from './pages/CatalogPage'
 import { ConsultationPage } from './pages/ConsultationPage'
 import { ProfessionalsPage } from './pages/ProfessionalsPage'
+import { ProfessionalDetailPage } from './pages/ProfessionalDetailPage'
 import { ProductsPage } from './pages/ProductsPage'
 import { StyleDetailPage } from './pages/StyleDetailPage'
 import { PublicContentProvider } from './hooks/usePublicContent'
@@ -22,7 +23,7 @@ const AdminApp = lazy(() => import('./admin/AdminApp').then((module) => ({ defau
 
 function HomePage() {
   const { settings } = usePublicContent()
-  useDocumentMeta(settings.seoTitle, settings.seoDescription)
+  useDocumentMeta(settings.seoTitle, settings.seoDescription, '/')
   return (
     <main id="contenido-principal">
       <Hero />
@@ -54,6 +55,10 @@ function CurrentPage() {
 
   if (path === '/profesionales') {
     return <ProfessionalsPage />
+  }
+
+  if (path.startsWith('/profesionales/')) {
+    return <ProfessionalDetailPage slug={decodeURIComponent(path.slice('/profesionales/'.length))} />
   }
 
   if (path === '/productos') {

@@ -18,10 +18,20 @@ export function Header() {
   useEffect(() => {
     if (!isHome) return
 
-    const updateHeader = () => setIsScrolled(window.scrollY > 36)
-    updateHeader()
-    window.addEventListener('scroll', updateHeader, { passive: true })
-    return () => window.removeEventListener('scroll', updateHeader)
+    const hero = document.querySelector<HTMLElement>('#contenido-principal > .hero')
+    if (!hero || !('IntersectionObserver' in window)) {
+      const updateHeader = () => setIsScrolled(window.scrollY > window.innerHeight * 0.75)
+      updateHeader()
+      window.addEventListener('scroll', updateHeader, { passive: true })
+      return () => window.removeEventListener('scroll', updateHeader)
+    }
+
+    const observer = new IntersectionObserver(([entry]) => setIsScrolled(!entry.isIntersecting), {
+      threshold: 0.12,
+      rootMargin: '-70px 0px 0px 0px',
+    })
+    observer.observe(hero)
+    return () => observer.disconnect()
   }, [isHome])
 
   const closeMenu = () => setIsMenuOpen(false)

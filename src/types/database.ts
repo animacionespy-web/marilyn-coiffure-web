@@ -51,6 +51,30 @@ export interface DatabaseProfessionalRow {
   instagram_url: string | null
 }
 
+export interface DatabaseProfessionalWorkRow {
+  id: string
+  professional_id: string
+  work_type: 'photo' | 'before_after'
+  title: string | null
+  image_url: string | null
+  image_path: string | null
+  image_zoom: number | null
+  image_position_x: number | null
+  image_position_y: number | null
+  before_image_url: string | null
+  before_image_path: string | null
+  before_image_zoom: number | null
+  before_image_position_x: number | null
+  before_image_position_y: number | null
+  after_image_url: string | null
+  after_image_path: string | null
+  after_image_zoom: number | null
+  after_image_position_x: number | null
+  after_image_position_y: number | null
+  active: boolean
+  display_order: number
+}
+
 export interface DatabaseProductRow {
   id: string
   name: string

@@ -2,7 +2,7 @@ import { PositionedImage } from '../../components/PositionedImage'
 import { AboutImageVisual } from '../../components/AboutImageVisual'
 import type { ImagePosition } from '../../types/image'
 
-export type ImageUsage = 'professional' | 'style' | 'product' | 'hero' | 'footer'
+export type ImageUsage = 'professional' | 'professional-work' | 'style' | 'product' | 'hero' | 'home-block' | 'footer'
 
 interface ImageContextPreviewProps {
   usage: ImageUsage
@@ -29,6 +29,15 @@ export function ImageContextPreview({ usage, imageUrl, imageAlt, position, title
           <ul className="professional-card__specialties">{(tags.length ? tags : ['Coloración', 'Balayage']).slice(0, 2).map((tag) => <li key={tag}>{tag}</li>)}</ul>
         </div>
       </article>
+    )
+  }
+
+  if (usage === 'professional-work') {
+    return (
+      <figure className="image-context-preview__work">
+        <PositionedImage src={imageUrl} alt={imageAlt} position={position} />
+        <figcaption>{safeTitle(title, 'Trabajo realizado')}</figcaption>
+      </figure>
     )
   }
 
@@ -73,6 +82,15 @@ export function ImageContextPreview({ usage, imageUrl, imageAlt, position, title
           </figure>
         ))}
       </div>
+    )
+  }
+
+  if (usage === 'home-block') {
+    return (
+      <article className="image-context-preview__home-block">
+        <PositionedImage src={imageUrl} alt={imageAlt} position={position} />
+        <div><span>{category?.trim() || 'Servicio'}</span><h2>{safeTitle(title, 'Bloque de la Home')}</h2>{description?.trim() && <p>{description}</p>}</div>
+      </article>
     )
   }
 

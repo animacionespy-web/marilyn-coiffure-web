@@ -4,11 +4,12 @@ import { products as fallbackProducts } from '../data/products'
 import { siteContent } from '../data/siteContent'
 import { styles as fallbackStyles } from '../data/styles'
 import { requireSupabase, supabaseConfiguration } from '../lib/supabase'
-import type { Professional, ProfessionalSpecialty } from '../types/professional'
+import type { Professional, ProfessionalSpecialty, ProfessionalWork } from '../types/professional'
 import type { Product, ProductCategory } from '../types/product'
 import type { Style, StyleCategory } from '../types/style'
 import type {
   AdminProfessional,
+  AdminProfessionalWork,
   AdminProduct,
   AdminStyle,
   Category,
@@ -18,6 +19,7 @@ import type {
 import type {
   DatabaseCategoryRow,
   DatabaseProfessionalRow,
+  DatabaseProfessionalWorkRow,
   DatabaseProductRow,
   DatabaseSettingRow,
   DatabaseStyleRow,
@@ -61,6 +63,12 @@ export const fallbackSiteSettings: SiteSettings = {
   seoTitle: 'Marilyn Coiffure | Belleza y estilo',
   seoDescription: 'Coloración, peinados y cuidado capilar con atención personalizada en Marilyn Coiffure.',
   specialties: siteContent.specialties.map(({ title, description }) => ({ title, description })),
+  homeVisualBlocks: [
+    { id: 'color', eyebrow: 'Color', title: 'Color & Transformaciones', text: 'Tonos, luces y cambios creados a partir de un diagnóstico profesional.', imageUrl: '/images/styles/color-miel.svg', imagePath: '', imagePosition: { zoom: 1, positionX: 50, positionY: 50 }, href: '/estilos?categoria=Coloración' },
+    { id: 'cuts', eyebrow: 'Forma', title: 'Cortes & Styling', text: 'Cortes con intención y terminaciones pensadas para acompañar tu rutina.', imageUrl: '/images/styles/corte-bob.svg', imagePath: '', imagePosition: { zoom: 1, positionX: 50, positionY: 50 }, href: '/estilos?categoria=Cortes' },
+    { id: 'treatments', eyebrow: 'Cuidado', title: 'Tratamientos & Salud capilar', text: 'Experiencias de hidratación y reparación definidas según tu cabello.', imageUrl: '/images/styles/tratamiento-hidratacion.svg', imagePath: '', imagePosition: { zoom: 1, positionX: 50, positionY: 50 }, href: '/estilos?categoria=Tratamientos' },
+    { id: 'events', eyebrow: 'Ocasiones', title: 'Novias & Eventos', text: 'Peinados y preparación personalizada para momentos que merecen atención especial.', imageUrl: '/images/styles/quince-semirrecogido.svg', imagePath: '', imagePosition: { zoom: 1, positionX: 50, positionY: 50 }, href: '/estilos?categoria=Quinceañeras' },
+  ],
 }
 
 const sortByOrderAndName = <Item extends { displayOrder: number; name: string }>(items: Item[]) =>
@@ -105,7 +113,27 @@ function mapAdminStyle(row: DatabaseStyleRow, professionalIds: string[]): AdminS
   }
 }
 
-function mapAdminProfessional(row: DatabaseProfessionalRow, styleIds: string[]): AdminProfessional {
+function mapAdminProfessionalWork(row: DatabaseProfessionalWorkRow): AdminProfessionalWork {
+  return {
+    id: row.id,
+    professionalId: row.professional_id,
+    type: row.work_type,
+    title: row.title ?? '',
+    imageUrl: row.image_url ?? '',
+    imagePath: row.image_path ?? '',
+    imagePosition: normalizeImagePosition({ zoom: row.image_zoom ?? 1, positionX: row.image_position_x ?? 50, positionY: row.image_position_y ?? 50 }),
+    beforeImageUrl: row.before_image_url ?? '',
+    beforeImagePath: row.before_image_path ?? '',
+    beforeImagePosition: normalizeImagePosition({ zoom: row.before_image_zoom ?? 1, positionX: row.before_image_position_x ?? 50, positionY: row.before_image_position_y ?? 50 }),
+    afterImageUrl: row.after_image_url ?? '',
+    afterImagePath: row.after_image_path ?? '',
+    afterImagePosition: normalizeImagePosition({ zoom: row.after_image_zoom ?? 1, positionX: row.after_image_position_x ?? 50, positionY: row.after_image_position_y ?? 50 }),
+    active: row.active,
+    displayOrder: row.display_order,
+  }
+}
+
+function mapAdminProfessional(row: DatabaseProfessionalRow, styleIds: string[], works: AdminProfessionalWork[]): AdminProfessional {
   return {
     id: row.id,
     name: row.name,
@@ -128,6 +156,7 @@ function mapAdminProfessional(row: DatabaseProfessionalRow, styleIds: string[]):
     availabilityNote: row.availability_note ?? '',
     instagramUrl: row.instagram_url ?? '',
     styleIds,
+    works,
   }
 }
 
@@ -257,11 +286,12 @@ export const professionalsService = {
     const client = requireSupabase()
     let query = client.from('professionals').select('*').order('display_order').order('name')
     if (!includeInactive) query = query.eq('active', true)
-    const [{ data, error }, relations] = await Promise.all([query, getRelations()])
+    const [{ data, error }, relations, works] = await Promise.all([query, getRelations(), getProfessionalWorks(includeInactive)])
     if (error) throw new Error(humanizeDataError(error, 'No pudimos cargar las profesionales.'))
     return ((data ?? []) as DatabaseProfessionalRow[]).map((row) => mapAdminProfessional(
       row,
       relations.filter((relation) => relation.professional_id === row.id).map((relation) => relation.style_id),
+      works.filter((work) => work.professionalId === row.id),
     ))
   },
   async save(professional: AdminProfessional) {
@@ -297,7 +327,8 @@ export const professionalsService = {
       )
       if (relationError) throw new Error('La profesional se guardó, pero no se pudieron actualizar sus estilos.')
     }
-    return mapAdminProfessional(saved, professional.styleIds)
+    const works = await syncProfessionalWorks(saved.id, professional.works)
+    return mapAdminProfessional(saved, professional.styleIds, works)
   },
   async remove(professional: AdminProfessional) {
     const client = requireSupabase()
@@ -348,6 +379,62 @@ export const productsService = {
   },
 }
 
+async function getProfessionalWorks(includeInactive = true) {
+  const client = requireSupabase()
+  let query = client.from('professional_works').select('*').order('display_order')
+  if (!includeInactive) query = query.eq('active', true)
+  const { data, error } = await query
+  if (error?.code === '42P01') return []
+  if (error) throw error
+  return ((data ?? []) as DatabaseProfessionalWorkRow[]).map(mapAdminProfessionalWork)
+}
+
+async function syncProfessionalWorks(professionalId: string, works: AdminProfessionalWork[]) {
+  if (works.length > 6) throw new Error('Cada profesional puede tener hasta 6 trabajos.')
+  const client = requireSupabase()
+  const normalizedWorks = works.map((work, index) => ({ ...work, professionalId, displayOrder: index }))
+  const { data: existingRows, error: existingError } = await client.from('professional_works').select('id').eq('professional_id', professionalId)
+  if (existingError) throw new Error('La profesional se guardó, pero no se pudieron verificar sus trabajos actuales.')
+  if (!normalizedWorks.length) {
+    const { error: deleteError } = await client.from('professional_works').delete().eq('professional_id', professionalId)
+    if (deleteError) throw new Error('La profesional se guardó, pero no se pudieron quitar sus trabajos.')
+    return []
+  }
+
+  const payload = normalizedWorks.map((work) => ({
+    id: work.id,
+    professional_id: professionalId,
+    work_type: work.type,
+    title: work.title.trim() || null,
+    image_url: work.type === 'photo' ? work.imageUrl || null : null,
+    image_path: work.type === 'photo' ? work.imagePath || null : null,
+    image_zoom: work.imagePosition.zoom,
+    image_position_x: work.imagePosition.positionX,
+    image_position_y: work.imagePosition.positionY,
+    before_image_url: work.type === 'before_after' ? work.beforeImageUrl || null : null,
+    before_image_path: work.type === 'before_after' ? work.beforeImagePath || null : null,
+    before_image_zoom: work.beforeImagePosition.zoom,
+    before_image_position_x: work.beforeImagePosition.positionX,
+    before_image_position_y: work.beforeImagePosition.positionY,
+    after_image_url: work.type === 'before_after' ? work.afterImageUrl || null : null,
+    after_image_path: work.type === 'before_after' ? work.afterImagePath || null : null,
+    after_image_zoom: work.afterImagePosition.zoom,
+    after_image_position_x: work.afterImagePosition.positionX,
+    after_image_position_y: work.afterImagePosition.positionY,
+    active: work.active,
+    display_order: work.displayOrder,
+  }))
+  const { data, error } = await client.from('professional_works').upsert(payload).select('*')
+  if (error) throw new Error(humanizeDataError(error, 'La profesional se guardó, pero no se pudieron actualizar sus trabajos.'))
+  const retainedIds = new Set(normalizedWorks.map((work) => work.id))
+  const staleIds = ((existingRows ?? []) as Array<{ id: string }>).map((row) => row.id).filter((id) => !retainedIds.has(id))
+  if (staleIds.length) {
+    const { error: deleteError } = await client.from('professional_works').delete().in('id', staleIds)
+    if (deleteError) throw new Error('Los trabajos se guardaron, pero no se pudieron quitar los trabajos eliminados.')
+  }
+  return ((data ?? []) as DatabaseProfessionalWorkRow[]).map(mapAdminProfessionalWork).sort((first, second) => first.displayOrder - second.displayOrder)
+}
+
 export const settingsService = {
   async get() {
     const client = requireSupabase()
@@ -366,6 +453,15 @@ export const settingsService = {
     settings.footerImageZoom = footerPosition.zoom
     settings.footerImagePositionX = footerPosition.positionX
     settings.footerImagePositionY = footerPosition.positionY
+    const configuredBlocks = Array.isArray(settings.homeVisualBlocks) ? settings.homeVisualBlocks : []
+    settings.homeVisualBlocks = fallbackSiteSettings.homeVisualBlocks.map((fallbackBlock) => {
+      const configured = configuredBlocks.find((block) => block && block.id === fallbackBlock.id)
+      return configured ? {
+        ...fallbackBlock,
+        ...configured,
+        imagePosition: normalizeImagePosition(configured.imagePosition),
+      } : { ...fallbackBlock, imagePosition: { ...fallbackBlock.imagePosition } }
+    })
     return settings
   },
   async save(values: Partial<SiteSettings>) {
@@ -445,6 +541,26 @@ function toPublicProfessional(professional: AdminProfessional): Professional {
     styleIds: professional.styleIds,
     availabilityNote: professional.availabilityNote,
     instagramUrl: professional.instagramUrl,
+    works: professional.works
+      .filter((work) => work.active)
+      .sort((first, second) => first.displayOrder - second.displayOrder)
+      .map((work): ProfessionalWork => ({
+        id: work.id,
+        professionalId: professional.id,
+        type: work.type,
+        title: work.title,
+        image: work.imageUrl,
+        imageAlt: work.title ? `${work.title}, trabajo de ${professional.name}` : `Trabajo realizado por ${professional.name}`,
+        imagePosition: work.imagePosition,
+        beforeImage: work.beforeImageUrl,
+        beforeImageAlt: `Antes del trabajo realizado por ${professional.name}`,
+        beforeImagePosition: work.beforeImagePosition,
+        afterImage: work.afterImageUrl,
+        afterImageAlt: `Después del trabajo realizado por ${professional.name}`,
+        afterImagePosition: work.afterImagePosition,
+        active: work.active,
+        order: work.displayOrder,
+      })),
   }
 }
 

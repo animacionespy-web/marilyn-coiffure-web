@@ -10,9 +10,10 @@ import { useDocumentMeta } from '../../hooks/useDocumentMeta'
 import { DEFAULT_IMAGE_POSITION } from '../../types/image'
 import { ImagePositionEditor } from '../components/ImagePositionEditor'
 import { PositionedImage } from '../../components/PositionedImage'
+import { ProfessionalWorksEditor } from '../components/ProfessionalWorksEditor'
 
 const emptyProfessional: AdminProfessional = {
-  id: '', name: '', slug: '', role: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION }, whatsappNumber: '', specialties: [], featured: false, active: true, displayOrder: 0, availabilityNote: '', instagramUrl: '', styleIds: [],
+  id: '', name: '', slug: '', role: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION }, whatsappNumber: '', specialties: [], featured: false, active: true, displayOrder: 0, availabilityNote: '', instagramUrl: '', styleIds: [], works: [],
 }
 
 export function AdminProfessionalsPage() {
@@ -20,6 +21,7 @@ export function AdminProfessionalsPage() {
   const [styles, setStyles] = useState<AdminStyle[]>([])
   const [editing, setEditing] = useState<AdminProfessional | null>(null)
   const [previousImagePath, setPreviousImagePath] = useState('')
+  const [retiredWorkImagePaths, setRetiredWorkImagePaths] = useState<string[]>([])
   const [query, setQuery] = useState('')
   const [specialty, setSpecialty] = useState('')
   const [loading, setLoading] = useState(true)
@@ -36,7 +38,7 @@ export function AdminProfessionalsPage() {
 
   useEffect(() => { if (new URLSearchParams(window.location.search).get('nuevo') === '1' && !loading) setEditing({ ...emptyProfessional, displayOrder: professionals.length + 1 }) }, [loading, professionals.length])
   useEffect(() => { const warn = (event: BeforeUnloadEvent) => { if (editing) { event.preventDefault(); event.returnValue = '' } }; window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn) }, [editing])
-  useEffect(() => { if (!editing) setPreviousImagePath('') }, [editing])
+  useEffect(() => { if (!editing) { setPreviousImagePath(''); setRetiredWorkImagePaths([]) } }, [editing])
 
   const specialties = useMemo(() => Array.from(new Set(professionals.flatMap((item) => item.specialties))).sort((a, b) => a.localeCompare(b, 'es')), [professionals])
   const filtered = useMemo(() => professionals.filter((professional) => `${professional.name} ${professional.role} ${professional.specialties.join(' ')}`.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es')) && (!specialty || professional.specialties.includes(specialty))), [professionals, query, specialty])
@@ -46,10 +48,13 @@ export function AdminProfessionalsPage() {
     event.preventDefault(); if (!editing) return
     if (!editing.name.trim()) { setError('El nombre es obligatorio.'); return }
     if (!editing.slug.trim()) { setError('El slug es obligatorio.'); return }
+    if (editing.works.length > 6) { setError('Cada profesional puede tener hasta 6 trabajos.'); return }
+    const incompleteWork = editing.works.find((work) => work.active && (work.type === 'photo' ? !work.imageUrl : !work.beforeImageUrl || !work.afterImageUrl))
+    if (incompleteWork) { setError('Completá las imágenes de cada trabajo visible o marcá el trabajo como oculto.'); return }
     const phoneError = validateInternationalWhatsapp(editing.whatsappNumber); if (phoneError) { setError(phoneError); return }
     if (!Number.isInteger(editing.displayOrder) || editing.displayOrder < 0) { setError('El orden debe ser un número entero válido.'); return }
     setSaving(true); setError(''); setMessage('')
-    try { const saved = await professionalsService.save(editing); if (previousImagePath && previousImagePath !== saved.imagePath) await removeSiteImage(previousImagePath); setProfessionals((current) => [...current.filter((item) => item.id !== saved.id), saved].sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name, 'es'))); setPreviousImagePath(''); setEditing(null); setMessage('Profesional guardada correctamente.') }
+    try { const saved = await professionalsService.save(editing); const pathsToRemove = [previousImagePath && previousImagePath !== saved.imagePath ? previousImagePath : '', ...retiredWorkImagePaths].filter(Boolean); await Promise.all(Array.from(new Set(pathsToRemove)).map(removeSiteImage)); setProfessionals((current) => [...current.filter((item) => item.id !== saved.id), saved].sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name, 'es'))); setPreviousImagePath(''); setRetiredWorkImagePaths([]); setEditing(null); setMessage('Profesional y portfolio guardados correctamente.') }
     catch (saveError) { setError(saveError instanceof Error ? saveError.message : 'No se pudo guardar la profesional.') }
     finally { setSaving(false) }
   }
@@ -57,7 +62,7 @@ export function AdminProfessionalsPage() {
   const remove = async (professional: AdminProfessional) => {
     if (!window.confirm(`¿Querés eliminar a “${professional.name}”? También se quitarán sus relaciones con estilos.`)) return
     setError(''); setMessage('')
-    try { await professionalsService.remove(professional); await removeSiteImage(professional.imagePath); setProfessionals((current) => current.filter((item) => item.id !== professional.id)); setMessage('Profesional eliminada.') }
+    try { await professionalsService.remove(professional); await Promise.all([professional.imagePath, ...professional.works.flatMap((work) => [work.imagePath, work.beforeImagePath, work.afterImagePath])].filter(Boolean).map(removeSiteImage)); setProfessionals((current) => current.filter((item) => item.id !== professional.id)); setMessage('Profesional eliminada.') }
     catch (removeError) { setError(removeError instanceof Error ? removeError.message : 'No se pudo eliminar la profesional.') }
   }
 
@@ -77,12 +82,14 @@ export function AdminProfessionalsPage() {
         <label>Rol o cargo<input value={editing.role} onChange={(event) => update('role', event.target.value)} /></label>
         <label>Orden<input type="number" min="0" step="1" value={editing.displayOrder} onChange={(event) => update('displayOrder', Number(event.target.value))} /></label>
         <label className="admin-form__wide">Especialidades separadas por coma<input value={editing.specialties.join(', ')} onChange={(event) => update('specialties', event.target.value.split(',').map((item) => item.trim()).filter(Boolean))} /></label>
-        <label className="admin-form__wide">Descripción corta<textarea rows={2} value={editing.shortDescription} onChange={(event) => update('shortDescription', event.target.value)} /></label>
-        <label className="admin-form__wide">Descripción completa<textarea rows={5} value={editing.fullDescription} onChange={(event) => update('fullDescription', event.target.value)} /></label>
+        <div className="admin-form__wide admin-form-section admin-form-section__heading"><p className="eyebrow">Presentación pública</p><h3>Lo que verán las clientas</h3><p>Estos textos aparecen en la ficha y el portfolio público de la profesional.</p></div>
+        <label className="admin-form__wide">Presentación breve<textarea rows={2} value={editing.shortDescription} onChange={(event) => update('shortDescription', event.target.value)} /></label>
+        <label className="admin-form__wide">Presentación completa<textarea rows={5} value={editing.fullDescription} onChange={(event) => update('fullDescription', event.target.value)} /></label>
         <label>Número de WhatsApp<input inputMode="numeric" placeholder="595XXXXXXXXX" value={editing.whatsappNumber} onChange={(event) => update('whatsappNumber', event.target.value.replace(/\D/g, ''))} /><small>Formato internacional, sin espacios ni signo +. Puede quedar vacío.</small></label>
         <label>Instagram opcional<input type="url" value={editing.instagramUrl} onChange={(event) => update('instagramUrl', event.target.value)} /></label>
         <label className="admin-form__wide">Nota de atención<textarea rows={2} value={editing.availabilityNote} onChange={(event) => update('availabilityNote', event.target.value)} /></label>
-        <div className="admin-form__wide"><ImageUploadField folder="professionals" label="Fotografía" imageUrl={editing.imageUrl} imagePosition={editing.imagePosition} onUploaded={(result) => { if (!previousImagePath) setPreviousImagePath(editing.imagePath); setEditing((current) => current ? { ...current, imageUrl: result.publicUrl, imagePath: result.path, imagePosition: { ...DEFAULT_IMAGE_POSITION } } : current) }} /><ImagePositionEditor usage="professional" imageUrl={editing.imageUrl} imageAlt={`Vista previa de ${editing.name || 'profesional'}`} value={editing.imagePosition} title={editing.name} category={editing.role} tags={editing.specialties} onSave={(imagePosition) => update('imagePosition', imagePosition)} /></div>
+        <div className="admin-form__wide admin-professional-main-photo"><h3>Foto principal</h3><ImageUploadField folder="professionals" label="Foto principal" imageUrl={editing.imageUrl} imagePosition={editing.imagePosition} onUploaded={(result) => { if (!previousImagePath) setPreviousImagePath(editing.imagePath); setEditing((current) => current ? { ...current, imageUrl: result.publicUrl, imagePath: result.path, imagePosition: { ...DEFAULT_IMAGE_POSITION } } : current) }} /><ImagePositionEditor usage="professional" imageUrl={editing.imageUrl} imageAlt={`Vista previa de ${editing.name || 'profesional'}`} value={editing.imagePosition} title={editing.name} category={editing.role} tags={editing.specialties} onSave={(imagePosition) => update('imagePosition', imagePosition)} /></div>
+        <div className="admin-form__wide"><ProfessionalWorksEditor works={editing.works} professionalName={editing.name} onChange={(works) => update('works', works)} onRetirePath={(path) => setRetiredWorkImagePaths((current) => path && !current.includes(path) ? [...current, path] : current)} /></div>
         <fieldset className="admin-form__wide admin-checkbox-grid"><legend>Estilos relacionados</legend>{styles.map((style) => <label className="admin-check" key={style.id}><input type="checkbox" checked={editing.styleIds.includes(style.id)} onChange={(event) => update('styleIds', event.target.checked ? [...editing.styleIds, style.id] : editing.styleIds.filter((id) => id !== style.id))} />{style.name}</label>)}</fieldset>
         <label className="admin-check"><input type="checkbox" checked={editing.active} onChange={(event) => update('active', event.target.checked)} />Visible en la web</label><label className="admin-check"><input type="checkbox" checked={editing.featured} onChange={(event) => update('featured', event.target.checked)} />Profesional destacada</label>
         {error && <p className="admin-field-error admin-form__wide" role="alert">{error}</p>}

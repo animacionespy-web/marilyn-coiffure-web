@@ -60,6 +60,25 @@ export interface AdminProfessional {
   availabilityNote: string
   instagramUrl: string
   styleIds: string[]
+  works: AdminProfessionalWork[]
+}
+
+export interface AdminProfessionalWork {
+  id: string
+  professionalId: string
+  type: 'photo' | 'before_after'
+  title: string
+  imageUrl: string
+  imagePath: string
+  imagePosition: ImagePosition
+  beforeImageUrl: string
+  beforeImagePath: string
+  beforeImagePosition: ImagePosition
+  afterImageUrl: string
+  afterImagePath: string
+  afterImagePosition: ImagePosition
+  active: boolean
+  displayOrder: number
 }
 
 export interface AdminProduct {
@@ -110,6 +129,18 @@ export interface SiteSettings {
   seoTitle: string
   seoDescription: string
   specialties: Array<{ title: string; description: string }>
+  homeVisualBlocks: HomeVisualBlock[]
+}
+
+export interface HomeVisualBlock {
+  id: 'color' | 'cuts' | 'treatments' | 'events'
+  eyebrow: string
+  title: string
+  text: string
+  imageUrl: string
+  imagePath: string
+  imagePosition: ImagePosition
+  href: string
 }
 
 export interface AuthState {

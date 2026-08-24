@@ -31,7 +31,10 @@ export function ProfessionalsPreview() {
                 <div className="home-professional-card__body">
                   <p>{professional.specialties[0] || professional.role}</p>
                   <h3>{professional.name}</h3>
-                  <a className="button button--dark" href="/profesionales">Elegir profesional</a>
+                  <div className="home-professional-card__actions">
+                    <a className="button button--outline" href={`/profesionales/${encodeURIComponent(professional.slug)}`}>Ver trabajos</a>
+                    <a className="button button--dark" href={`/profesionales?profesional=${encodeURIComponent(professional.slug)}`}>Elegir profesional</a>
+                  </div>
                 </div>
               </article>
             ))}

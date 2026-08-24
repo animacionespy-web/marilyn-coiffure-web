@@ -34,6 +34,16 @@ En el panel, **Ajustar encuadre** actualiza la vista previa localmente y recién
 
 Ejecutá manualmente `migrations/202608120001_add_location_settings.sql` para habilitar la lectura pública y edición desde `/admin/contenido` del enlace de Google Maps, la URL embed y la dirección visible. Es una migración aditiva e idempotente; no modifica las tablas de estilos, profesionales ni productos.
 
+### Portfolio público de profesionales
+
+Ejecutá manualmente `migrations/202608240001_add_professional_works.sql` para crear `professional_works`. Esta tabla guarda hasta 6 trabajos por profesional, admite fotografía simple o un par antes/después y conserva el encuadre de cada imagen.
+
+- No crea usuarios, credenciales ni roles para profesionales.
+- La lectura pública se limita a trabajos visibles de profesionales activas.
+- Crear, editar y eliminar requiere la cuenta admin actual mediante `public.is_admin()`.
+- Las imágenes se cargan en `site-images/professional-works/` usando las políticas existentes del bucket.
+- La migración no se ejecuta automáticamente: debe aplicarse desde **SQL Editor** antes de usar la edición de portfolios en producción.
+
 ## 4. Cargar los datos iniciales
 
 Ejecutá `seed.sql` desde SQL Editor. Usa UUID conocidos, `upsert` y `on conflict`, por lo que puede repetirse sin duplicar registros. Los textos, nombres e imágenes son provisionales. No carga números inventados.
