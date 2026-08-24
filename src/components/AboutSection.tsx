@@ -7,7 +7,7 @@ export function AboutSection() {
   return (
     <section className="about section" id="esencia" aria-labelledby="about-title">
       <div className="container about__grid">
-        <div className="about__content">
+        <div className="about__content" data-reveal>
           <p className="eyebrow">{siteContent.about.eyebrow}</p>
           <h2 id="about-title">{settings.aboutTitle}</h2>
           {(paragraphs.length ? paragraphs : siteContent.about.paragraphs).map((paragraph) => (
@@ -16,7 +16,6 @@ export function AboutSection() {
           <ul className="quality-list" aria-label="Valores del salón">
             {siteContent.about.qualities.map((quality) => (
               <li key={quality.title}>
-                <span aria-hidden="true">✦</span>
                 <div><strong>{quality.title}</strong><small>{quality.description}</small></div>
               </li>
             ))}

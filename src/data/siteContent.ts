@@ -1,7 +1,6 @@
 export const siteContent = {
   brand: 'Marilyn Coiffure',
   navigation: [
-    { label: 'Inicio', href: '/' },
     { label: 'Esencia', href: '/#esencia' },
     { label: 'Servicios', href: '/#servicios' },
     { label: 'Estilos', href: '/estilos' },
