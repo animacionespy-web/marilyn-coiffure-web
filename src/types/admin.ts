@@ -111,11 +111,23 @@ export interface SiteSettings {
   heroImageZoom: number
   heroImagePositionX: number
   heroImagePositionY: number
-  footerImageUrl: string
-  footerImagePath: string
-  footerImageZoom: number
-  footerImagePositionX: number
-  footerImagePositionY: number
+  homeBeforeAfterTitle: string
+  homeBeforeAfterText: string
+  homeBeforeImageUrl: string
+  homeBeforeImagePath: string
+  homeBeforeImageZoom: number
+  homeBeforeImagePositionX: number
+  homeBeforeImagePositionY: number
+  homeAfterImageUrl: string
+  homeAfterImagePath: string
+  homeAfterImageZoom: number
+  homeAfterImagePositionX: number
+  homeAfterImagePositionY: number
+  finalEditorialImageUrl: string
+  finalEditorialImagePath: string
+  finalEditorialImageZoom: number
+  finalEditorialImagePositionX: number
+  finalEditorialImagePositionY: number
   aboutTitle: string
   aboutText: string
   ctaTitle: string

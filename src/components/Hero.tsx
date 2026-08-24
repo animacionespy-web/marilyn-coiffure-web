@@ -16,7 +16,6 @@ export function Hero() {
         )}
       </div>
       <div className="hero__content">
-        <p className="eyebrow">Villarrica · Paraguay</p>
         <img className="hero__logo" src="/images/brand/marilyn-coiffure-logo-white-clean.png" alt="Marilyn Coiffure" width="706" height="218" />
         <h1 id="hero-title">
           {titleParts.map((part, index) => part.toLocaleLowerCase('es') === 'evoluciona' ? <em key={`${part}-${index}`}>{part}</em> : part)}

@@ -27,7 +27,7 @@ function sectionDescription(section: HomeEditorSectionId) {
     services: 'Seleccioná cada bloque visual para editar su texto, imagen y enlace.',
     products: 'Los productos se administran en su catálogo y se reflejan automáticamente acá.',
     professionals: 'Las profesionales y sus trabajos reutilizan el editor completo existente.',
-    transformations: 'Abrí directamente los trabajos de cada profesional para cargar el antes y el después.',
+    transformations: 'Configurá las dos fotografías independientes de la comparación destacada de la Home.',
     closing: 'Controlá la fotografía editorial que aparece antes del cierre.',
     cta: 'Editá la invitación final y el aviso de confirmación.',
     location: 'Actualizá dirección, enlace y mapa embebido.',
@@ -231,9 +231,10 @@ export function VisualHomeEditor() {
                 </>}
 
                 {selectedSection === 'closing' && <>
-                  <ImageUploadField folder="home" label="Imagen editorial final" imageUrl={draft.footerImageUrl} imagePosition={{ zoom: draft.footerImageZoom, positionX: draft.footerImagePositionX, positionY: draft.footerImagePositionY }} onUploaded={(result) => { retirePath(draft.footerImagePath); setDraft((current) => current ? { ...current, footerImageUrl: result.publicUrl, footerImagePath: result.path, footerImageZoom: 1, footerImagePositionX: 50, footerImagePositionY: 50 } : current) }} />
-                  {draft.footerImageUrl && <button className="admin-button admin-button--secondary" type="button" onClick={() => { retirePath(draft.footerImagePath); setDraft((current) => current ? { ...current, footerImageUrl: '', footerImagePath: '', footerImageZoom: 1, footerImagePositionX: 50, footerImagePositionY: 50 } : current) }}>Quitar imagen</button>}
-                  <ImagePositionEditor usage="footer" imageUrl={draft.footerImageUrl} imageAlt="Vista previa de la imagen editorial final" value={{ zoom: draft.footerImageZoom, positionX: draft.footerImagePositionX, positionY: draft.footerImagePositionY }} onSave={(position) => setDraft((current) => current ? { ...current, footerImageZoom: position.zoom, footerImagePositionX: position.positionX, footerImagePositionY: position.positionY } : current)} />
+                  <p className="admin-visual-panel__intro">Esta fotografía pertenece únicamente al cierre editorial de la Home.</p>
+                  <ImageUploadField folder="home" label="Imagen editorial final" imageUrl={draft.finalEditorialImageUrl} imagePosition={{ zoom: draft.finalEditorialImageZoom, positionX: draft.finalEditorialImagePositionX, positionY: draft.finalEditorialImagePositionY }} onUploaded={(result) => { retirePath(draft.finalEditorialImagePath); setDraft((current) => current ? { ...current, finalEditorialImageUrl: result.publicUrl, finalEditorialImagePath: result.path, finalEditorialImageZoom: 1, finalEditorialImagePositionX: 50, finalEditorialImagePositionY: 50 } : current) }} />
+                  {draft.finalEditorialImageUrl && <button className="admin-button admin-button--secondary" type="button" onClick={() => { retirePath(draft.finalEditorialImagePath); setDraft((current) => current ? { ...current, finalEditorialImageUrl: '', finalEditorialImagePath: '', finalEditorialImageZoom: 1, finalEditorialImagePositionX: 50, finalEditorialImagePositionY: 50 } : current) }}>Quitar imagen</button>}
+                  <ImagePositionEditor usage="footer" imageUrl={draft.finalEditorialImageUrl} imageAlt="Vista previa de la imagen editorial final" value={{ zoom: draft.finalEditorialImageZoom, positionX: draft.finalEditorialImagePositionX, positionY: draft.finalEditorialImagePositionY }} onSave={(position) => setDraft((current) => current ? { ...current, finalEditorialImageZoom: position.zoom, finalEditorialImagePositionX: position.positionX, finalEditorialImagePositionY: position.positionY } : current)} />
                 </>}
 
                 {selectedSection === 'footer' && <>
@@ -247,19 +248,20 @@ export function VisualHomeEditor() {
 
                 {selectedSection === 'products' && <div className="admin-visual-entity-list">{previewContent.products.slice(0, 8).map((product) => <article key={product.id}><div><strong>{product.name}</strong><small>{product.category}</small></div><button type="button" onClick={() => leaveEditor(`/admin/productos?editar=${encodeURIComponent(product.id)}`)}>Editar producto</button></article>)}<button className="admin-button admin-button--primary" type="button" onClick={() => leaveEditor('/admin/productos')}>Administrar productos</button></div>}
 
-                {selectedSection === 'transformations' && <div className="admin-visual-works-list">
-                  <div className="admin-visual-repair">
-                    <strong>Antes y después se edita por profesional</strong>
-                    <p>Elegí una profesional para abrir directamente sus seis espacios de trabajos.</p>
-                  </div>
-                  <div className="admin-visual-entity-list">
-                    {previewContent.professionals.filter((professional) => professional.active).map((professional) => {
-                      const comparisonCount = (professional.works ?? []).filter((work) => work.type === 'before_after').length
-                      return <article key={professional.id}><div><strong>{professional.name}</strong><small>{comparisonCount ? `${comparisonCount} antes/después configurado${comparisonCount === 1 ? '' : 's'}` : 'Sin antes/después cargado'}</small></div><button type="button" onClick={() => leaveEditor(`/admin/profesionales?editar=${encodeURIComponent(professional.id)}&seccion=trabajos`)}>Editar antes y después</button></article>
-                    })}
-                    {!previewContent.professionals.some((professional) => professional.active) && <p>No hay profesionales activas para administrar.</p>}
-                  </div>
-                  <button className="admin-button admin-button--primary" type="button" onClick={() => leaveEditor('/admin/profesionales')}>Ver todas las profesionales</button>
+                {selectedSection === 'transformations' && <div className="admin-home-comparison-editor">
+                  <p className="admin-visual-panel__intro">Comparación destacada de la página principal.</p>
+                  <label>Título opcional<input value={draft.homeBeforeAfterTitle} onChange={(event) => update('homeBeforeAfterTitle', event.target.value)} /></label>
+                  <label>Texto opcional<textarea rows={3} value={draft.homeBeforeAfterText} onChange={(event) => update('homeBeforeAfterText', event.target.value)} /></label>
+                  <section className="admin-home-comparison-editor__side" aria-labelledby="admin-home-before-title">
+                    <h3 id="admin-home-before-title">Antes</h3>
+                    <ImageUploadField folder="home" label="Fotografía Antes" imageUrl={draft.homeBeforeImageUrl} imagePosition={{ zoom: draft.homeBeforeImageZoom, positionX: draft.homeBeforeImagePositionX, positionY: draft.homeBeforeImagePositionY }} onUploaded={(result) => { retirePath(draft.homeBeforeImagePath); setDraft((current) => current ? { ...current, homeBeforeImageUrl: result.publicUrl, homeBeforeImagePath: result.path, homeBeforeImageZoom: 1, homeBeforeImagePositionX: 50, homeBeforeImagePositionY: 50 } : current) }} />
+                    <ImagePositionEditor usage="professional-work" imageUrl={draft.homeBeforeImageUrl} imageAlt="Vista previa de la fotografía Antes" value={{ zoom: draft.homeBeforeImageZoom, positionX: draft.homeBeforeImagePositionX, positionY: draft.homeBeforeImagePositionY }} title="Antes" onSave={(position) => setDraft((current) => current ? { ...current, homeBeforeImageZoom: position.zoom, homeBeforeImagePositionX: position.positionX, homeBeforeImagePositionY: position.positionY } : current)} />
+                  </section>
+                  <section className="admin-home-comparison-editor__side" aria-labelledby="admin-home-after-title">
+                    <h3 id="admin-home-after-title">Después</h3>
+                    <ImageUploadField folder="home" label="Fotografía Después" imageUrl={draft.homeAfterImageUrl} imagePosition={{ zoom: draft.homeAfterImageZoom, positionX: draft.homeAfterImagePositionX, positionY: draft.homeAfterImagePositionY }} onUploaded={(result) => { retirePath(draft.homeAfterImagePath); setDraft((current) => current ? { ...current, homeAfterImageUrl: result.publicUrl, homeAfterImagePath: result.path, homeAfterImageZoom: 1, homeAfterImagePositionX: 50, homeAfterImagePositionY: 50 } : current) }} />
+                    <ImagePositionEditor usage="professional-work" imageUrl={draft.homeAfterImageUrl} imageAlt="Vista previa de la fotografía Después" value={{ zoom: draft.homeAfterImageZoom, positionX: draft.homeAfterImagePositionX, positionY: draft.homeAfterImagePositionY }} title="Después" onSave={(position) => setDraft((current) => current ? { ...current, homeAfterImageZoom: position.zoom, homeAfterImagePositionX: position.positionX, homeAfterImagePositionY: position.positionY } : current)} />
+                  </section>
                 </div>}
 
                 {directManagement[selectedSection] && <div className="admin-visual-direct"><p>Este bloque se alimenta de los estilos y trabajos publicados, por eso se administra desde su editor especializado.</p><button className="admin-button admin-button--primary" type="button" onClick={() => leaveEditor(directManagement[selectedSection]!.href)}>{directManagement[selectedSection]!.text}</button></div>}

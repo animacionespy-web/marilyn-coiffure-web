@@ -1,12 +1,26 @@
-import { useId, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
-import type { ProfessionalWork } from '../../types/professional'
+import { useId, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import type { ImagePosition } from '../../types/image'
 import { PositionedImage } from '../PositionedImage'
 
-export function BeforeAfterComparison({ work, professionalName, index }: {
-  work: ProfessionalWork
-  professionalName: string
-  index: number
-}) {
+interface BeforeAfterComparisonProps {
+  beforeImage: string
+  afterImage: string
+  beforeImageAlt: string
+  afterImageAlt: string
+  beforeImagePosition?: ImagePosition
+  afterImagePosition?: ImagePosition
+  accessibleLabel?: string
+}
+
+export function BeforeAfterComparison({
+  beforeImage,
+  afterImage,
+  beforeImageAlt,
+  afterImageAlt,
+  beforeImagePosition,
+  afterImagePosition,
+  accessibleLabel = 'Comparar fotografía antes y después',
+}: BeforeAfterComparisonProps) {
   const id = useId()
   const [position, setPosition] = useState(50)
   const [isDragging, setIsDragging] = useState(false)
@@ -42,17 +56,34 @@ export function BeforeAfterComparison({ work, professionalName, index }: {
     setIsDragging(false)
   }
 
+  const moveWithKeyboard = (event: ReactKeyboardEvent<HTMLInputElement>) => {
+    const movements: Partial<Record<string, number>> = {
+      ArrowLeft: position - 1,
+      ArrowDown: position - 1,
+      ArrowRight: position + 1,
+      ArrowUp: position + 1,
+      PageDown: position - 10,
+      PageUp: position + 10,
+      Home: 0,
+      End: 100,
+    }
+    const nextPosition = movements[event.key]
+    if (nextPosition === undefined) return
+    event.preventDefault()
+    setPosition(Math.min(100, Math.max(0, nextPosition)))
+  }
+
   return (
     <div className={`before-after-comparison ${isDragging ? 'is-dragging' : ''}`} style={style}>
       <div className="before-after-comparison__stage">
-        <PositionedImage src={work.beforeImage} alt={work.beforeImageAlt || `Antes del trabajo ${index + 1} de ${professionalName}`} loading="lazy" width="900" height="1080" position={work.beforeImagePosition} />
+        <PositionedImage src={beforeImage} alt={beforeImageAlt} loading="lazy" width="900" height="1080" position={beforeImagePosition} />
         <div className="before-after-comparison__after">
-          <PositionedImage src={work.afterImage} alt={work.afterImageAlt || `Después del trabajo ${index + 1} de ${professionalName}`} loading="lazy" width="900" height="1080" position={work.afterImagePosition} />
+          <PositionedImage src={afterImage} alt={afterImageAlt} loading="lazy" width="900" height="1080" position={afterImagePosition} />
         </div>
         <span className="before-after-comparison__label before-after-comparison__label--before">Antes</span>
         <span className="before-after-comparison__label before-after-comparison__label--after">Después</span>
         <span className="before-after-comparison__divider" aria-hidden="true"><i>↔</i></span>
-        <label className="sr-only" htmlFor={id}>Comparar antes y después del trabajo {index + 1}</label>
+        <label className="sr-only" htmlFor={id}>{accessibleLabel}</label>
         <input
           id={id}
           type="range"
@@ -62,6 +93,7 @@ export function BeforeAfterComparison({ work, professionalName, index }: {
           value={position}
           onInput={(event) => setPosition(Number(event.currentTarget.value))}
           onChange={(event) => setPosition(Number(event.target.value))}
+          onKeyDown={moveWithKeyboard}
           onPointerDown={startDragging}
           onPointerMove={moveDivider}
           onPointerUp={stopDragging}

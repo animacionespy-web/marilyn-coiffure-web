@@ -7765,10 +7765,6 @@ button.admin-professional-work-slot:focus-visible {
   padding-bottom: 76px;
 }
 
-.maqueta-home .hero .eyebrow {
-  color: var(--color-gold);
-}
-
 .maqueta-home .hero__logo {
   width: min(300px, 64vw);
   height: auto;
@@ -8935,10 +8931,6 @@ button.admin-professional-work-slot:focus-visible {
   padding-bottom: clamp(240px, 28vh, 310px);
 }
 
-.maqueta-home .hero .eyebrow {
-  margin: 0 0 8px;
-}
-
 .maqueta-home .hero__logo {
   width: min(270px, 62vw);
   margin: 0 0 16px;
@@ -9041,6 +9033,11 @@ button.admin-professional-work-slot:focus-visible {
   grid-template-columns: 1fr;
 }
 
+.maqueta-home .editorial-transformations__grid--comparison-only {
+  grid-template-columns: minmax(0, 920px);
+  justify-content: center;
+}
+
 .maqueta-home .editorial-transformations__grid--gallery-only .editorial-transformations__gallery {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -9063,6 +9060,20 @@ button.admin-professional-work-slot:focus-visible {
   background:
     radial-gradient(120% 90% at 30% 12%, rgb(255 253 249 / 76%), transparent 62%),
     var(--color-taupe);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  line-height: 1.7;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.maqueta-home .before-after-comparison__pending-after {
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  color: rgb(255 253 249 / 78%);
+  background: var(--color-black);
   font-size: .72rem;
   font-weight: 700;
   letter-spacing: .15em;
@@ -9774,6 +9785,34 @@ button.admin-professional-work-slot:focus-visible {
 .admin-visual-repair .admin-button {
   width: 100%;
   margin-top: 3px;
+}
+
+.admin-visual-panel__intro {
+  margin: 0;
+  color: #6f655a;
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.admin-home-comparison-editor {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-home-comparison-editor__side {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #ded2c1;
+  border-radius: 12px;
+  background: #f8f2e8;
+}
+
+.admin-home-comparison-editor__side h3 {
+  margin: 0;
+  color: #2f2a25;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
 }
 
 .admin-visual-entity-list article {

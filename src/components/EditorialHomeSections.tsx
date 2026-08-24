@@ -1,5 +1,4 @@
 import { usePublicContent } from '../hooks/usePublicContent'
-import type { ProfessionalWork } from '../types/professional'
 import type { Style } from '../types/style'
 import { BeforeAfterComparison } from './professionals/BeforeAfterComparison'
 import { PositionedImage } from './PositionedImage'
@@ -118,29 +117,11 @@ export function EditorialProcessSection() {
   )
 }
 
-interface WorkWithProfessional {
-  work: ProfessionalWork
-  professionalName: string
-  professionalSlug: string
-}
-
 export function EditorialTransformationsSection() {
-  const { professionals } = usePublicContent()
-  const works = professionals
-    .filter((professional) => professional.active)
-    .flatMap<WorkWithProfessional>((professional) => (professional.works ?? [])
-      .filter((work) => {
-        if (!work.active) return false
-        if (work.type === 'photo') return Boolean(work.image)
-        return Boolean(work.beforeImage && work.afterImage && work.beforeImage !== work.afterImage)
-      })
-      .map((work) => ({ work, professionalName: professional.name, professionalSlug: professional.slug })))
-    .sort((first, second) => first.work.order - second.work.order)
-
-  const comparison = works.find(({ work }) => work.type === 'before_after' && work.beforeImage && work.afterImage)
-  const gallery = works
-    .filter(({ work }) => work.id !== comparison?.work.id && (work.image || work.afterImage))
-    .slice(0, 4)
+  const { settings } = usePublicContent()
+  const beforeImage = settings.homeBeforeImageUrl.trim()
+  const afterImage = settings.homeAfterImageUrl.trim()
+  const comparisonReady = Boolean(beforeImage && afterImage && beforeImage !== afterImage)
 
   return (
     <section className="editorial-transformations section" id="transformaciones" aria-labelledby="editorial-transformations-title">
@@ -148,36 +129,36 @@ export function EditorialTransformationsSection() {
         <div className="section-heading section-heading--split" data-reveal>
           <div>
             <p className="eyebrow">Transformaciones Marilyn</p>
-            <h2 id="editorial-transformations-title">Antes y después: cambios que hablan por sí mismos.</h2>
+            <h2 id="editorial-transformations-title">{settings.homeBeforeAfterTitle}</h2>
           </div>
-          <p>{comparison
-            ? 'Deslizá el comparador o explorá cada portfolio para conocer nuestros trabajos publicados.'
-            : 'La sección está lista para mostrar el próximo antes y después cargado desde el panel.'}</p>
+          <p>{settings.homeBeforeAfterText || (comparisonReady
+            ? 'Deslizá el comparador para descubrir la transformación.'
+            : 'La comparación destacada se publicará cuando ambas fotografías estén cargadas.')}</p>
         </div>
 
-        <div className="editorial-transformations__grid" data-reveal>
-          {comparison && (
+        <div className="editorial-transformations__grid editorial-transformations__grid--comparison-only" data-reveal>
+          {comparisonReady && (
             <div className="editorial-transformations__comparison">
-              <BeforeAfterComparison work={comparison.work} professionalName={comparison.professionalName} index={0} />
-              <a href={`/profesionales/${encodeURIComponent(comparison.professionalSlug)}`}>Trabajo de {comparison.professionalName} <span aria-hidden="true">→</span></a>
+              <BeforeAfterComparison
+                beforeImage={beforeImage}
+                afterImage={afterImage}
+                beforeImageAlt="Antes de la transformación destacada de Marilyn Coiffure"
+                afterImageAlt="Después de la transformación destacada de Marilyn Coiffure"
+                beforeImagePosition={{ zoom: settings.homeBeforeImageZoom, positionX: settings.homeBeforeImagePositionX, positionY: settings.homeBeforeImagePositionY }}
+                afterImagePosition={{ zoom: settings.homeAfterImageZoom, positionX: settings.homeAfterImagePositionX, positionY: settings.homeAfterImagePositionY }}
+                accessibleLabel="Comparar el antes y después destacado de Marilyn Coiffure"
+              />
             </div>
           )}
-          {!comparison && (
+          {!comparisonReady && (
             <div className="editorial-transformations__comparison editorial-transformations__comparison--pending">
               <div className="before-after-comparison before-after-comparison--pending">
                 <div className="before-after-comparison__stage">
                   <div className="before-after-comparison__pending-before">
                     <span>Fotografía del antes<br />pendiente de carga</span>
                   </div>
-                  <div className="before-after-comparison__after">
-                    <PositionedImage
-                      src="/images/home/maqueta-esencia.jpg"
-                      alt="Referencia fotográfica de un resultado realizado en Marilyn Coiffure"
-                      loading="lazy"
-                      width="900"
-                      height="1080"
-                      position={{ zoom: 1, positionX: 50, positionY: 50 }}
-                    />
+                  <div className="before-after-comparison__after before-after-comparison__pending-after">
+                    <span>Fotografía del después<br />pendiente de carga</span>
                   </div>
                   <span className="before-after-comparison__label before-after-comparison__label--before">Antes</span>
                   <span className="before-after-comparison__label before-after-comparison__label--after">Después</span>
@@ -185,21 +166,6 @@ export function EditorialTransformationsSection() {
                 </div>
                 <p className="before-after-comparison__help">Cargá ambas fotografías reales desde el panel para activar el comparador.</p>
               </div>
-            </div>
-          )}
-          {gallery.length > 0 && (
-            <div className="editorial-transformations__gallery">
-              {gallery.map(({ work, professionalName, professionalSlug }) => {
-                const image = work.type === 'before_after' ? work.afterImage : work.image
-                const alt = work.type === 'before_after' ? work.afterImageAlt : work.imageAlt
-                const position = work.type === 'before_after' ? work.afterImagePosition : work.imagePosition
-                return (
-                  <a href={`/profesionales/${encodeURIComponent(professionalSlug)}`} key={work.id} aria-label={`Ver trabajo de ${professionalName}`}>
-                    <PositionedImage src={image} alt={alt || `Trabajo realizado por ${professionalName}`} loading="lazy" width="720" height="900" position={position} />
-                    <span>{work.title || professionalName}</span>
-                  </a>
-                )
-              })}
             </div>
           )}
         </div>
@@ -281,17 +247,17 @@ export function EditorialTreatmentsSection() {
 
 export function EditorialClosingImage() {
   const { settings } = usePublicContent()
-  if (!settings.footerImageUrl) return null
+  if (!settings.finalEditorialImageUrl) return null
 
   return (
     <section className="editorial-closing-image" aria-label="Imagen editorial de Marilyn Coiffure" data-reveal>
       <PositionedImage
-        src={settings.footerImageUrl}
+        src={settings.finalEditorialImageUrl}
         alt="Imagen editorial de Marilyn Coiffure"
         loading="lazy"
         width="1600"
         height="900"
-        position={{ zoom: settings.footerImageZoom, positionX: settings.footerImagePositionX, positionY: settings.footerImagePositionY }}
+        position={{ zoom: settings.finalEditorialImageZoom, positionX: settings.finalEditorialImagePositionX, positionY: settings.finalEditorialImagePositionY }}
       />
     </section>
   )

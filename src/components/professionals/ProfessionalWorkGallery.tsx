@@ -16,7 +16,15 @@ export function ProfessionalWorkGallery({ works, professionalName }: { works: Pr
       {completeWorks.slice(0, 6).map((work, index) => (
         <article className={`professional-work-card professional-work-card--${work.type}`} key={work.id}>
           {work.type === 'before_after' ? (
-            <BeforeAfterComparison work={work} professionalName={professionalName} index={index} />
+            <BeforeAfterComparison
+              beforeImage={work.beforeImage}
+              afterImage={work.afterImage}
+              beforeImageAlt={work.beforeImageAlt || `Antes del trabajo ${index + 1} de ${professionalName}`}
+              afterImageAlt={work.afterImageAlt || `Después del trabajo ${index + 1} de ${professionalName}`}
+              beforeImagePosition={work.beforeImagePosition}
+              afterImagePosition={work.afterImagePosition}
+              accessibleLabel={`Comparar antes y después del trabajo ${index + 1} de ${professionalName}`}
+            />
           ) : (
             <PositionedImage src={work.image} alt={work.imageAlt} loading="lazy" width="900" height="1080" position={work.imagePosition} />
           )}

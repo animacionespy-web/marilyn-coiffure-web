@@ -45,11 +45,23 @@ export const fallbackSiteSettings: SiteSettings = {
   heroImageZoom: 1,
   heroImagePositionX: 50,
   heroImagePositionY: 34,
-  footerImageUrl: '',
-  footerImagePath: '',
-  footerImageZoom: 1,
-  footerImagePositionX: 50,
-  footerImagePositionY: 50,
+  homeBeforeAfterTitle: 'Antes y después: cambios que hablan por sí mismos.',
+  homeBeforeAfterText: '',
+  homeBeforeImageUrl: '',
+  homeBeforeImagePath: '',
+  homeBeforeImageZoom: 1,
+  homeBeforeImagePositionX: 50,
+  homeBeforeImagePositionY: 50,
+  homeAfterImageUrl: '',
+  homeAfterImagePath: '',
+  homeAfterImageZoom: 1,
+  homeAfterImagePositionX: 50,
+  homeAfterImagePositionY: 50,
+  finalEditorialImageUrl: '',
+  finalEditorialImagePath: '',
+  finalEditorialImageZoom: 1,
+  finalEditorialImagePositionX: 50,
+  finalEditorialImagePositionY: 50,
   aboutTitle: siteContent.about.title,
   aboutText: siteContent.about.paragraphs.join('\n\n'),
   ctaTitle: siteContent.contact.title,
@@ -449,10 +461,18 @@ export const settingsService = {
     settings.heroImageZoom = heroPosition.zoom
     settings.heroImagePositionX = heroPosition.positionX
     settings.heroImagePositionY = heroPosition.positionY
-    const footerPosition = normalizeImagePosition({ zoom: settings.footerImageZoom, positionX: settings.footerImagePositionX, positionY: settings.footerImagePositionY })
-    settings.footerImageZoom = footerPosition.zoom
-    settings.footerImagePositionX = footerPosition.positionX
-    settings.footerImagePositionY = footerPosition.positionY
+    const beforePosition = normalizeImagePosition({ zoom: settings.homeBeforeImageZoom, positionX: settings.homeBeforeImagePositionX, positionY: settings.homeBeforeImagePositionY })
+    settings.homeBeforeImageZoom = beforePosition.zoom
+    settings.homeBeforeImagePositionX = beforePosition.positionX
+    settings.homeBeforeImagePositionY = beforePosition.positionY
+    const afterPosition = normalizeImagePosition({ zoom: settings.homeAfterImageZoom, positionX: settings.homeAfterImagePositionX, positionY: settings.homeAfterImagePositionY })
+    settings.homeAfterImageZoom = afterPosition.zoom
+    settings.homeAfterImagePositionX = afterPosition.positionX
+    settings.homeAfterImagePositionY = afterPosition.positionY
+    const finalEditorialPosition = normalizeImagePosition({ zoom: settings.finalEditorialImageZoom, positionX: settings.finalEditorialImagePositionX, positionY: settings.finalEditorialImagePositionY })
+    settings.finalEditorialImageZoom = finalEditorialPosition.zoom
+    settings.finalEditorialImagePositionX = finalEditorialPosition.positionX
+    settings.finalEditorialImagePositionY = finalEditorialPosition.positionY
     const configuredBlocks = Array.isArray(settings.homeVisualBlocks) ? settings.homeVisualBlocks : []
     settings.homeVisualBlocks = fallbackSiteSettings.homeVisualBlocks.map((fallbackBlock) => {
       const configured = configuredBlocks.find((block) => block && block.id === fallbackBlock.id)

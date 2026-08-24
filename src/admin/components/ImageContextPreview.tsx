@@ -77,7 +77,6 @@ export function ImageContextPreview({ usage, imageUrl, imageAlt, position, title
               <PositionedImage src={imageUrl} alt={imageAlt} position={position} />
               <div className="image-context-preview__hero-overlay" aria-hidden="true" />
               <div className="image-context-preview__hero-copy">
-                <span>Villarrica, Paraguay</span>
                 <strong>{safeTitle(title, 'Belleza que evoluciona con vos.')}</strong>
               </div>
             </div>
