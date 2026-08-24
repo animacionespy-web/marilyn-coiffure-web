@@ -9736,9 +9736,36 @@ button.admin-professional-work-slot:focus-visible {
 }
 
 .admin-visual-entity-list,
-.admin-visual-direct {
+.admin-visual-direct,
+.admin-visual-works-list {
   display: grid;
   gap: 10px;
+}
+
+.admin-visual-repair {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid rgb(176 141 87 / 42%);
+  border-radius: 10px;
+  background: rgb(176 141 87 / 9%);
+}
+
+.admin-visual-repair strong {
+  color: #2f2a25;
+  font-size: .9rem;
+}
+
+.admin-visual-repair p {
+  margin: 0;
+  color: #6f655a;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.admin-visual-repair .admin-button {
+  width: 100%;
+  margin-top: 3px;
 }
 
 .admin-visual-entity-list article {

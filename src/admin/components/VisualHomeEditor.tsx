@@ -3,7 +3,7 @@ import { Footer } from '../../components/Footer'
 import { HomeSections, homeEditorSectionLabels, type HomeEditorSectionId } from '../../components/HomeSections'
 import { LocationMap } from '../../components/LocationMap'
 import { PublicContentPreviewProvider } from '../../hooks/usePublicContent'
-import { loadPublicContent, settingsService, type PublicContent } from '../../services/content'
+import { fallbackSiteSettings, loadPublicContent, settingsService, type PublicContent } from '../../services/content'
 import { removeSiteImage } from '../../services/storage'
 import type { HomeVisualBlock, SiteSettings } from '../../types/admin'
 import { DEFAULT_IMAGE_POSITION } from '../../types/image'
@@ -16,7 +16,6 @@ type PreviewMode = 'desktop' | 'mobile'
 const directManagement: Partial<Record<HomeEditorSectionId, { text: string; href: string }>> = {
   color: { text: 'Administrar estilos de color', href: '/admin/estilos' },
   process: { text: 'Administrar contenido relacionado', href: '/admin/estilos' },
-  transformations: { text: 'Administrar trabajos profesionales', href: '/admin/profesionales' },
   events: { text: 'Administrar peinados y eventos', href: '/admin/estilos' },
   treatments: { text: 'Administrar tratamientos', href: '/admin/estilos' },
 }
@@ -28,6 +27,7 @@ function sectionDescription(section: HomeEditorSectionId) {
     services: 'Seleccioná cada bloque visual para editar su texto, imagen y enlace.',
     products: 'Los productos se administran en su catálogo y se reflejan automáticamente acá.',
     professionals: 'Las profesionales y sus trabajos reutilizan el editor completo existente.',
+    transformations: 'Abrí directamente los trabajos de cada profesional para cargar el antes y el después.',
     closing: 'Controlá la fotografía editorial que aparece antes del cierre.',
     cta: 'Editá la invitación final y el aviso de confirmación.',
     location: 'Actualizá dirección, enlace y mapa embebido.',
@@ -139,6 +139,18 @@ export function VisualHomeEditor() {
     setMessage('Cambios descartados.')
   }
 
+  const restoreApprovedHero = () => {
+    setMessage('')
+    setDraft((current) => current ? {
+      ...current,
+      heroTitle: fallbackSiteSettings.heroTitle,
+      heroDescription: fallbackSiteSettings.heroDescription,
+      heroImageZoom: fallbackSiteSettings.heroImageZoom,
+      heroImagePositionX: fallbackSiteSettings.heroImagePositionX,
+      heroImagePositionY: fallbackSiteSettings.heroImagePositionY,
+    } : current)
+  }
+
   const handlePreviewClick = (event: ReactMouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement
     if (target.closest('[data-admin-action]')) return
@@ -198,6 +210,11 @@ export function VisualHomeEditor() {
                 {selectedSection === 'hero' && <>
                   <label>Título principal<input value={draft.heroTitle} onChange={(event) => update('heroTitle', event.target.value)} /></label>
                   <label>Descripción<textarea rows={4} value={draft.heroDescription} onChange={(event) => update('heroDescription', event.target.value)} /></label>
+                  <div className="admin-visual-repair">
+                    <strong>¿La portada quedó fuera de encuadre?</strong>
+                    <p>Restaurá el texto y la posición aprobados sin reemplazar la fotografía.</p>
+                    <button className="admin-button admin-button--secondary" type="button" onClick={restoreApprovedHero}>Restaurar portada aprobada</button>
+                  </div>
                   <ImageUploadField folder="home" label="Fotografía principal" imageUrl={draft.heroImageUrl} imagePosition={{ zoom: draft.heroImageZoom, positionX: draft.heroImagePositionX, positionY: draft.heroImagePositionY }} onUploaded={(result) => { retirePath(draft.heroImagePath); setDraft((current) => current ? { ...current, heroImageUrl: result.publicUrl, heroImagePath: result.path, heroImageZoom: 1, heroImagePositionX: 50, heroImagePositionY: 50 } : current) }} />
                   <ImagePositionEditor usage="hero" imageUrl={draft.heroImageUrl} imageAlt="Vista previa de la portada" value={{ zoom: draft.heroImageZoom, positionX: draft.heroImagePositionX, positionY: draft.heroImagePositionY }} title={draft.heroTitle} onSave={(position) => setDraft((current) => current ? { ...current, heroImageZoom: position.zoom, heroImagePositionX: position.positionX, heroImagePositionY: position.positionY } : current)} />
                 </>}
@@ -246,6 +263,21 @@ export function VisualHomeEditor() {
                 {selectedSection === 'professionals' && <div className="admin-visual-entity-list">{previewContent.professionals.slice(0, 8).map((professional) => <article key={professional.id}><div><strong>{professional.name}</strong><small>{professional.specialties[0] || professional.role}</small></div><div><button type="button" onClick={() => leaveEditor(`/admin/profesionales?editar=${encodeURIComponent(professional.id)}`)}>Editar profesional</button><button type="button" onClick={() => leaveEditor(`/admin/profesionales?editar=${encodeURIComponent(professional.id)}&seccion=trabajos`)}>Editar trabajos</button></div></article>)}<button className="admin-button admin-button--primary" type="button" onClick={() => leaveEditor('/admin/profesionales')}>Administrar profesionales</button></div>}
 
                 {selectedSection === 'products' && <div className="admin-visual-entity-list">{previewContent.products.slice(0, 8).map((product) => <article key={product.id}><div><strong>{product.name}</strong><small>{product.category}</small></div><button type="button" onClick={() => leaveEditor(`/admin/productos?editar=${encodeURIComponent(product.id)}`)}>Editar producto</button></article>)}<button className="admin-button admin-button--primary" type="button" onClick={() => leaveEditor('/admin/productos')}>Administrar productos</button></div>}
+
+                {selectedSection === 'transformations' && <div className="admin-visual-works-list">
+                  <div className="admin-visual-repair">
+                    <strong>Antes y después se edita por profesional</strong>
+                    <p>Elegí una profesional para abrir directamente sus seis espacios de trabajos.</p>
+                  </div>
+                  <div className="admin-visual-entity-list">
+                    {previewContent.professionals.filter((professional) => professional.active).map((professional) => {
+                      const comparisonCount = (professional.works ?? []).filter((work) => work.type === 'before_after').length
+                      return <article key={professional.id}><div><strong>{professional.name}</strong><small>{comparisonCount ? `${comparisonCount} antes/después configurado${comparisonCount === 1 ? '' : 's'}` : 'Sin antes/después cargado'}</small></div><button type="button" onClick={() => leaveEditor(`/admin/profesionales?editar=${encodeURIComponent(professional.id)}&seccion=trabajos`)}>Editar antes y después</button></article>
+                    })}
+                    {!previewContent.professionals.some((professional) => professional.active) && <p>No hay profesionales activas para administrar.</p>}
+                  </div>
+                  <button className="admin-button admin-button--primary" type="button" onClick={() => leaveEditor('/admin/profesionales')}>Ver todas las profesionales</button>
+                </div>}
 
                 {directManagement[selectedSection] && <div className="admin-visual-direct"><p>Este bloque se alimenta de los estilos y trabajos publicados, por eso se administra desde su editor especializado.</p><button className="admin-button admin-button--primary" type="button" onClick={() => leaveEditor(directManagement[selectedSection]!.href)}>{directManagement[selectedSection]!.text}</button></div>}
               </div>
