@@ -542,7 +542,13 @@ function toPublicProfessional(professional: AdminProfessional): Professional {
     availabilityNote: professional.availabilityNote,
     instagramUrl: professional.instagramUrl,
     works: professional.works
-      .filter((work) => work.active)
+      .filter((work) => {
+        if (!work.active) return false
+        if (work.type === 'photo') return Boolean(work.imageUrl.trim())
+        const beforeImage = work.beforeImageUrl.trim()
+        const afterImage = work.afterImageUrl.trim()
+        return Boolean(beforeImage && afterImage && beforeImage !== afterImage)
+      })
       .sort((first, second) => first.displayOrder - second.displayOrder)
       .map((work): ProfessionalWork => ({
         id: work.id,

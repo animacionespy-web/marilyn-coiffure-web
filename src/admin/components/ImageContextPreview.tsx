@@ -73,9 +73,13 @@ export function ImageContextPreview({ usage, imageUrl, imageAlt, position, title
       <div className="image-context-preview__hero-grid">
         {(['desktop', 'mobile'] as const).map((viewport) => (
           <figure className={`image-context-preview__hero image-context-preview__hero--${viewport}`} key={viewport}>
-            <div className="hero__visual">
-              <div className="hero__frame"><PositionedImage className="hero__photo" src={imageUrl} alt={imageAlt} position={position} /></div>
-              <div className="hero__note"><span>Dueña</span><strong>Marilyn</strong></div>
+            <div className="image-context-preview__hero-canvas">
+              <PositionedImage src={imageUrl} alt={imageAlt} position={position} />
+              <div className="image-context-preview__hero-overlay" aria-hidden="true" />
+              <div className="image-context-preview__hero-copy">
+                <span>Villarrica, Paraguay</span>
+                <strong>{safeTitle(title, 'Belleza que evoluciona con vos.')}</strong>
+              </div>
             </div>
             <figcaption>Portada {viewport === 'desktop' ? 'en PC' : 'en celular'}</figcaption>
           </figure>

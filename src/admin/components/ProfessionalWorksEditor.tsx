@@ -21,6 +21,13 @@ const createEmptyWork = (displayOrder: number): AdminProfessionalWork => ({
   displayOrder,
 })
 
+const getCompletionMessage = (work: AdminProfessionalWork) => {
+  if (work.type === 'photo') return work.imageUrl.trim() ? '' : 'Cargá la fotografía antes de hacer visible este trabajo.'
+  if (!work.beforeImageUrl.trim() || !work.afterImageUrl.trim()) return 'Cargá una fotografía en Antes y otra en Después para publicarlo.'
+  if (work.beforeImageUrl.trim() === work.afterImageUrl.trim()) return 'Antes y Después deben usar fotografías diferentes.'
+  return ''
+}
+
 export function ProfessionalWorksEditor({ works, professionalName, onChange, onRetirePath }: {
   works: AdminProfessionalWork[]
   professionalName: string
@@ -53,13 +60,14 @@ export function ProfessionalWorksEditor({ works, professionalName, onChange, onR
       ;[work.beforeImagePath, work.afterImagePath].filter(Boolean).forEach(onRetirePath)
       updateWork(work.id, {
         type,
+        active: false,
         beforeImageUrl: '', beforeImagePath: '', beforeImagePosition: { ...DEFAULT_IMAGE_POSITION },
         afterImageUrl: '', afterImagePath: '', afterImagePosition: { ...DEFAULT_IMAGE_POSITION },
       })
       return
     }
     if (work.imagePath) onRetirePath(work.imagePath)
-    updateWork(work.id, { type, imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION } })
+    updateWork(work.id, { type, active: false, imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION } })
   }
 
   return (
@@ -70,8 +78,9 @@ export function ProfessionalWorksEditor({ works, professionalName, onChange, onR
 
       {works.length === 0 ? <p className="admin-professional-works__empty">Todavía no hay trabajos cargados.</p> : (
         <div className="admin-professional-works__list">
-          {works.map((work, index) => (
-            <article className="admin-professional-work" key={work.id}>
+          {works.map((work, index) => {
+            const completionMessage = getCompletionMessage(work)
+            return <article className="admin-professional-work" key={work.id}>
               <div className="admin-professional-work__heading">
                 <div><span>Trabajo {index + 1}</span><strong>{work.title || (work.type === 'before_after' ? 'Antes y después' : 'Fotografía')}</strong></div>
                 <div className="admin-professional-work__order">
@@ -84,8 +93,10 @@ export function ProfessionalWorksEditor({ works, professionalName, onChange, onR
               <div className="admin-professional-work__fields">
                 <label>Título opcional<input value={work.title} placeholder="Ej.: Balayage natural" maxLength={80} onChange={(event) => updateWork(work.id, { title: event.target.value })} /></label>
                 <label>Presentación<select value={work.type} onChange={(event) => changeType(work, event.target.value as AdminProfessionalWork['type'])}><option value="photo">Fotografía</option><option value="before_after">Antes y después</option></select></label>
-                <label className="admin-check"><input type="checkbox" checked={work.active} onChange={(event) => updateWork(work.id, { active: event.target.checked })} />Visible en el portfolio</label>
+                <label className="admin-check"><input type="checkbox" checked={work.active && !completionMessage} disabled={Boolean(completionMessage)} onChange={(event) => updateWork(work.id, { active: event.target.checked })} />Visible en el portfolio</label>
               </div>
+
+              {completionMessage && <p className="admin-professional-work__status" role="status">{completionMessage}</p>}
 
               {work.type === 'photo' ? (
                 <div className="admin-professional-work__media">
@@ -107,7 +118,7 @@ export function ProfessionalWorksEditor({ works, professionalName, onChange, onR
                 </div>
               )}
             </article>
-          ))}
+          })}
         </div>
       )}
       {works.length < 6 && (

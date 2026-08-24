@@ -129,9 +129,15 @@ export function EditorialTransformationsSection() {
   const works = professionals
     .filter((professional) => professional.active)
     .flatMap<WorkWithProfessional>((professional) => (professional.works ?? [])
-      .filter((work) => work.active)
+      .filter((work) => {
+        if (!work.active) return false
+        if (work.type === 'photo') return Boolean(work.image)
+        return Boolean(work.beforeImage && work.afterImage && work.beforeImage !== work.afterImage)
+      })
       .map((work) => ({ work, professionalName: professional.name, professionalSlug: professional.slug })))
     .sort((first, second) => first.work.order - second.work.order)
+
+  if (!works.length) return null
 
   const comparison = works.find(({ work }) => work.type === 'before_after' && work.beforeImage && work.afterImage)
   const gallery = works
@@ -149,27 +155,11 @@ export function EditorialTransformationsSection() {
           <p>Deslizá el comparador o explorá cada portfolio para conocer nuestros trabajos publicados.</p>
         </div>
 
-        <div className={`editorial-transformations__grid ${comparison || !works.length ? '' : 'editorial-transformations__grid--gallery-only'}`} data-reveal>
+        <div className={`editorial-transformations__grid ${comparison ? '' : 'editorial-transformations__grid--gallery-only'}`} data-reveal>
           {comparison && (
             <div className="editorial-transformations__comparison">
               <BeforeAfterComparison work={comparison.work} professionalName={comparison.professionalName} index={0} />
               <a href={`/profesionales/${encodeURIComponent(comparison.professionalSlug)}`}>Trabajo de {comparison.professionalName} <span aria-hidden="true">→</span></a>
-            </div>
-          )}
-          {!comparison && !works.length && (
-            <div className="editorial-transformations__comparison editorial-transformations__comparison--pending">
-              <div className="before-after-comparison before-after-comparison--pending">
-                <div className="before-after-comparison__stage">
-                  <div className="before-after-comparison__pending-before"><span>Fotografía del antes<br />pendiente de carga</span></div>
-                  <div className="before-after-comparison__after">
-                    <PositionedImage src="/images/home/maqueta-esencia.jpg" alt="Referencia fotográfica de un resultado realizado en Marilyn Coiffure" loading="lazy" width="900" height="1080" position={{ zoom: 1, positionX: 50, positionY: 50 }} />
-                  </div>
-                  <span className="before-after-comparison__label before-after-comparison__label--before">Antes</span>
-                  <span className="before-after-comparison__label before-after-comparison__label--after">Después</span>
-                  <span className="before-after-comparison__divider" aria-hidden="true"><i>↔</i></span>
-                </div>
-                <p className="before-after-comparison__help">El comparador se activará al cargar ambas fotografías reales desde el panel.</p>
-              </div>
             </div>
           )}
           {gallery.length > 0 && (

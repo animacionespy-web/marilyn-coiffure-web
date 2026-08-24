@@ -3,13 +3,17 @@ import { PositionedImage } from '../PositionedImage'
 import { BeforeAfterComparison } from './BeforeAfterComparison'
 
 export function ProfessionalWorkGallery({ works, professionalName }: { works: ProfessionalWork[]; professionalName: string }) {
-  if (!works.length) {
+  const completeWorks = works.filter((work) => work.type === 'photo'
+    ? Boolean(work.image)
+    : Boolean(work.beforeImage && work.afterImage && work.beforeImage !== work.afterImage))
+
+  if (!completeWorks.length) {
     return <p className="professional-portfolio__empty">Los trabajos de {professionalName} se publicarán próximamente.</p>
   }
 
   return (
     <div className="professional-work-grid">
-      {works.slice(0, 6).map((work, index) => (
+      {completeWorks.slice(0, 6).map((work, index) => (
         <article className={`professional-work-card professional-work-card--${work.type}`} key={work.id}>
           {work.type === 'before_after' ? (
             <BeforeAfterComparison work={work} professionalName={professionalName} index={index} />
