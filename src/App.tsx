@@ -1,22 +1,8 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { AboutSection } from './components/AboutSection'
-import { AvailabilityCTA } from './components/AvailabilityCTA'
 import { Footer } from './components/Footer'
 import { FloatingConsultationButton } from './components/FloatingConsultationButton'
 import { Header } from './components/Header'
-import { Hero } from './components/Hero'
-import {
-  EditorialClosingImage,
-  EditorialColorSection,
-  EditorialEventsSection,
-  EditorialProcessSection,
-  EditorialTransformationsSection,
-  EditorialTreatmentsSection,
-} from './components/EditorialHomeSections'
-import { LocationSection } from './components/LocationSection'
-import { ProfessionalsPreview } from './components/ProfessionalsPreview'
-import { ProductsPreview } from './components/ProductsPreview'
-import { SpecialtyHighlights } from './components/SpecialtyHighlights'
+import { HomeSections } from './components/HomeSections'
 import { CatalogPage } from './pages/CatalogPage'
 import { ConsultationPage } from './pages/ConsultationPage'
 import { ProfessionalsPage } from './pages/ProfessionalsPage'
@@ -68,19 +54,7 @@ function HomePage() {
 
   return (
     <main className="maqueta-home" id="contenido-principal">
-      <Hero />
-      <AboutSection />
-      <SpecialtyHighlights />
-      <EditorialColorSection />
-      <EditorialProcessSection />
-      <EditorialTransformationsSection />
-      <EditorialEventsSection />
-      <EditorialTreatmentsSection />
-      <ProductsPreview />
-      <ProfessionalsPreview />
-      <EditorialClosingImage />
-      <AvailabilityCTA />
-      <LocationSection />
+      <HomeSections />
       <FloatingConsultationButton />
     </main>
   )

@@ -2,7 +2,10 @@ import { usePublicContent } from '../hooks/usePublicContent'
 import { PublicContentState } from './PublicContentState'
 import { PositionedImage } from './PositionedImage'
 
-export function ProfessionalsPreview() {
+export function ProfessionalsPreview({ editorMode = false, onEditProfessional }: {
+  editorMode?: boolean
+  onEditProfessional?: (professionalId: string, target: 'profile' | 'works') => void
+} = {}) {
   const { professionals, loading, error, retry } = usePublicContent()
   const visibleProfessionals = professionals
     .filter((professional) => professional.active)
@@ -35,6 +38,7 @@ export function ProfessionalsPreview() {
                     <a className="button button--dark" href={`/profesionales?profesional=${encodeURIComponent(professional.slug)}`}>Elegir profesional</a>
                   </div>
                 </div>
+                {editorMode && <div className="admin-preview-card-actions" data-admin-action><button type="button" onClick={() => onEditProfessional?.(professional.id, 'profile')}>Editar profesional</button><button type="button" onClick={() => onEditProfessional?.(professional.id, 'works')}>Editar trabajos</button></div>}
               </article>
             ))}
           </div>

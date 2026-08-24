@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useDocumentMeta } from '../../hooks/useDocumentMeta'
 import { productsService } from '../../services/content'
 import { removeSiteImage } from '../../services/storage'
@@ -25,6 +25,7 @@ export function AdminProductsPage() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [request, setRequest] = useState(0)
+  const requestedEditHandled = useRef(false)
 
   useDocumentMeta('Productos | Administración Marilyn Coiffure', 'Gestión privada de los productos del salón.')
 
@@ -37,6 +38,16 @@ export function AdminProductsPage() {
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('nuevo') === '1' && !loading) setEditing({ ...emptyProduct, displayOrder: products.length + 1 })
   }, [loading, products.length])
+
+  useEffect(() => {
+    if (loading || requestedEditHandled.current) return
+    const requested = new URLSearchParams(window.location.search).get('editar')
+    if (!requested) return
+    const product = products.find((item) => item.id === requested || item.slug === requested)
+    if (!product) return
+    requestedEditHandled.current = true
+    setEditing(product)
+  }, [loading, products])
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => { if (editing) { event.preventDefault(); event.returnValue = '' } }

@@ -71,7 +71,7 @@ export function ProfessionalWorksEditor({ works, professionalName, onChange, onR
   }
 
   return (
-    <section className="admin-professional-works" aria-labelledby="professional-works-title">
+    <section className="admin-professional-works" id="professional-works-editor" aria-labelledby="professional-works-title">
       <div className="admin-professional-works__heading">
         <div><p className="eyebrow">Portfolio público</p><h3 id="professional-works-title">Trabajos realizados</h3><p>Subí hasta 6 trabajos. Solo los marcados como visibles aparecerán en la web.</p></div>
       </div>

@@ -1,7 +1,10 @@
 import { usePublicContent } from '../hooks/usePublicContent'
 import { PositionedImage } from './PositionedImage'
 
-export function SpecialtyHighlights() {
+export function SpecialtyHighlights({ editorMode = false, onEditBlock }: {
+  editorMode?: boolean
+  onEditBlock?: (blockId: string) => void
+} = {}) {
   const { settings } = usePublicContent()
   return (
     <section className="home-visual-services section" id="servicios" aria-labelledby="specialties-title">
@@ -26,6 +29,7 @@ export function SpecialtyHighlights() {
                   <strong>Explorar <span aria-hidden="true">→</span></strong>
                 </div>
               </a>
+              {editorMode && <button className="admin-preview-card-action" data-admin-action type="button" onClick={() => onEditBlock?.(block.id)}>Editar</button>}
             </article>
           ))}
         </div>

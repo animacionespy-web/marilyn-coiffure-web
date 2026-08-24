@@ -1,13 +1,23 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { fallbackSiteSettings, loadPublicContent, type PublicContent } from '../services/content'
 
-interface PublicContentState extends PublicContent {
+export interface PublicContentState extends PublicContent {
   loading: boolean
   error: string
   retry: () => void
 }
 
 const PublicContentContext = createContext<PublicContentState | null>(null)
+
+export function PublicContentPreviewProvider({ content, children }: { content: PublicContent; children: ReactNode }) {
+  const value = useMemo<PublicContentState>(() => ({
+    ...content,
+    loading: false,
+    error: '',
+    retry: () => undefined,
+  }), [content])
+  return <PublicContentContext.Provider value={value}>{children}</PublicContentContext.Provider>
+}
 
 export function PublicContentProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<PublicContent | null>(null)

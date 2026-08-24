@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { AdminEmpty, AdminError, AdminLoading } from '../components/AdminFeedback'
 import { ImageUploadField } from '../components/ImageUploadField'
 import { AdminPageHeader } from '../components/AdminPageHeader'
@@ -29,6 +29,7 @@ export function AdminProfessionalsPage() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [request, setRequest] = useState(0)
+  const requestedEditHandled = useRef(false)
   useDocumentMeta('Profesionales | Administración Marilyn Coiffure', 'Gestión privada del equipo profesional.')
 
   useEffect(() => {
@@ -37,6 +38,17 @@ export function AdminProfessionalsPage() {
   }, [request])
 
   useEffect(() => { if (new URLSearchParams(window.location.search).get('nuevo') === '1' && !loading) setEditing({ ...emptyProfessional, displayOrder: professionals.length + 1 }) }, [loading, professionals.length])
+  useEffect(() => {
+    if (loading || requestedEditHandled.current) return
+    const params = new URLSearchParams(window.location.search)
+    const requested = params.get('editar')
+    if (!requested) return
+    const professional = professionals.find((item) => item.id === requested || item.slug === requested)
+    if (!professional) return
+    requestedEditHandled.current = true
+    setEditing(professional)
+    if (params.get('seccion') === 'trabajos') window.setTimeout(() => document.querySelector('#professional-works-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120)
+  }, [loading, professionals])
   useEffect(() => { const warn = (event: BeforeUnloadEvent) => { if (editing) { event.preventDefault(); event.returnValue = '' } }; window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn) }, [editing])
   useEffect(() => { if (!editing) { setPreviousImagePath(''); setRetiredWorkImagePaths([]) } }, [editing])
 
