@@ -3,7 +3,7 @@ import { Footer } from '../../components/Footer'
 import { HomeSections, homeEditorSectionLabels, type HomeEditorSectionId } from '../../components/HomeSections'
 import { LocationMap } from '../../components/LocationMap'
 import { PublicContentPreviewProvider } from '../../hooks/usePublicContent'
-import { fallbackSiteSettings, loadPublicContent, settingsService, type PublicContent } from '../../services/content'
+import { loadPublicContent, settingsService, type PublicContent } from '../../services/content'
 import { removeSiteImage } from '../../services/storage'
 import type { HomeVisualBlock, SiteSettings } from '../../types/admin'
 import { DEFAULT_IMAGE_POSITION } from '../../types/image'
@@ -139,18 +139,6 @@ export function VisualHomeEditor() {
     setMessage('Cambios descartados.')
   }
 
-  const restoreApprovedHero = () => {
-    setMessage('')
-    setDraft((current) => current ? {
-      ...current,
-      heroTitle: fallbackSiteSettings.heroTitle,
-      heroDescription: fallbackSiteSettings.heroDescription,
-      heroImageZoom: fallbackSiteSettings.heroImageZoom,
-      heroImagePositionX: fallbackSiteSettings.heroImagePositionX,
-      heroImagePositionY: fallbackSiteSettings.heroImagePositionY,
-    } : current)
-  }
-
   const handlePreviewClick = (event: ReactMouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement
     if (target.closest('[data-admin-action]')) return
@@ -210,11 +198,6 @@ export function VisualHomeEditor() {
                 {selectedSection === 'hero' && <>
                   <label>Título principal<input value={draft.heroTitle} onChange={(event) => update('heroTitle', event.target.value)} /></label>
                   <label>Descripción<textarea rows={4} value={draft.heroDescription} onChange={(event) => update('heroDescription', event.target.value)} /></label>
-                  <div className="admin-visual-repair">
-                    <strong>¿La portada quedó fuera de encuadre?</strong>
-                    <p>Restaurá el texto y la posición aprobados sin reemplazar la fotografía.</p>
-                    <button className="admin-button admin-button--secondary" type="button" onClick={restoreApprovedHero}>Restaurar portada aprobada</button>
-                  </div>
                   <ImageUploadField folder="home" label="Fotografía principal" imageUrl={draft.heroImageUrl} imagePosition={{ zoom: draft.heroImageZoom, positionX: draft.heroImagePositionX, positionY: draft.heroImagePositionY }} onUploaded={(result) => { retirePath(draft.heroImagePath); setDraft((current) => current ? { ...current, heroImageUrl: result.publicUrl, heroImagePath: result.path, heroImageZoom: 1, heroImagePositionX: 50, heroImagePositionY: 50 } : current) }} />
                   <ImagePositionEditor usage="hero" imageUrl={draft.heroImageUrl} imageAlt="Vista previa de la portada" value={{ zoom: draft.heroImageZoom, positionX: draft.heroImagePositionX, positionY: draft.heroImagePositionY }} title={draft.heroTitle} onSave={(position) => setDraft((current) => current ? { ...current, heroImageZoom: position.zoom, heroImagePositionX: position.positionX, heroImagePositionY: position.positionY } : current)} />
                 </>}

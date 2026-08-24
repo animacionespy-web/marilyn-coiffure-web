@@ -8929,12 +8929,19 @@ button.admin-professional-work-slot:focus-visible {
 }
 
 .maqueta-home .hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   padding-bottom: clamp(240px, 28vh, 310px);
+}
+
+.maqueta-home .hero .eyebrow {
+  margin: 0 0 8px;
 }
 
 .maqueta-home .hero__logo {
   width: min(270px, 62vw);
-  margin: 12px 0 18px;
+  margin: 0 0 16px;
 }
 
 .maqueta-home .hero h1 {
@@ -9257,6 +9264,7 @@ button.admin-professional-work-slot:focus-visible {
 
   .maqueta-home .hero__logo {
     width: min(230px, 66vw);
+    margin-bottom: 14px;
   }
 
   .maqueta-home .hero__description {
