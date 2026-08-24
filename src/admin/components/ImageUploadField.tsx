@@ -9,7 +9,7 @@ export function ImageUploadField({ folder, imageUrl, imagePosition, label, onUpl
   imageUrl: string
   imagePosition?: ImagePosition
   label: string
-  onUploaded: (result: UploadResult) => void
+  onUploaded: (result: UploadResult) => void | Promise<void>
 }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
@@ -24,9 +24,11 @@ export function ImageUploadField({ folder, imageUrl, imagePosition, label, onUpl
     setUploading(true)
     setError('')
     try {
-      onUploaded(await uploadSiteImage(file, folder))
+      const result = await uploadSiteImage(file, folder)
+      await onUploaded(result)
     } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : 'No se pudo subir la imagen.')
+      const message = uploadError instanceof Error ? uploadError.message : 'No se pudo subir la imagen.'
+      setError(message)
     } finally {
       setUploading(false)
     }
@@ -40,7 +42,11 @@ export function ImageUploadField({ folder, imageUrl, imagePosition, label, onUpl
       </div>
       <label className="admin-button admin-button--secondary">
         {uploading ? 'Subiendo…' : 'Seleccionar imagen'}
-        <input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={(event) => selectFile(event.target.files?.[0])} />
+        <input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={async (event) => {
+          const input = event.currentTarget
+          await selectFile(input.files?.[0])
+          input.value = ''
+        }} />
       </label>
       <small>JPG, JPEG, PNG o WEBP. Máximo 5 MB. Recomendamos comprimirla antes de subir.</small>
       {error && <p className="admin-field-error" role="alert">{error}</p>}
