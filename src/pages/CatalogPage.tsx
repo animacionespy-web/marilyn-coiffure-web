@@ -60,6 +60,7 @@ export function CatalogPage() {
   useDocumentMeta(
     'Catálogo de estilos | Marilyn Coiffure',
     'Explorá cortes, coloración, peinados y tratamientos de Marilyn Coiffure y elegí el estilo ideal para consultar disponibilidad.',
+    '/estilos',
   )
 
   const isStyleRecommended = (style: Style) => Boolean(

@@ -8,15 +8,15 @@ export function ProfessionalsPreview() {
   const visibleProfessionals = professionals
     .filter((professional) => professional.active)
     .sort((first, second) => Number(second.featured) - Number(first.featured) || first.order - second.order)
-    .slice(0, 3)
+    .slice(0, 4)
 
   return (
-    <section className="home-professionals section" aria-labelledby="home-professionals-title">
+    <section className="home-professionals section" id="equipo" aria-labelledby="home-professionals-title">
       <div className="container">
         <div className="section-heading home-professionals__heading">
-          <p className="eyebrow">Especialistas</p>
-          <h2 id="home-professionals-title">Conocé a cada profesional</h2>
-          <p>Elegí a la profesional ideal según el servicio que buscás.</p>
+          <p className="eyebrow">Equipo Marilyn</p>
+          <h2 id="home-professionals-title">Las manos detrás de cada servicio.</h2>
+          <p>Conocé sus especialidades, explorá sus trabajos y elegí con quién querés atenderte.</p>
         </div>
 
         {visibleProfessionals.length === 0 ? (

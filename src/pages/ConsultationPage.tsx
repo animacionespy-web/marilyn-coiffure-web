@@ -55,6 +55,7 @@ export function ConsultationPage() {
   useDocumentMeta(
     'Consultar disponibilidad | Marilyn Coiffure',
     'Elegí el día y horario deseados y enviá una consulta de disponibilidad por WhatsApp a Marilyn Coiffure.',
+    '/consulta',
   )
 
   useEffect(() => saveConsultationDraft(form), [form])

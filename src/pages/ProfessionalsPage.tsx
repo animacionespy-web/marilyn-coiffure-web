@@ -45,7 +45,7 @@ export function ProfessionalsPage() {
     }
   }, [loading])
 
-  useDocumentMeta('Profesionales | Marilyn Coiffure', 'Conocé al equipo de Marilyn Coiffure y elegí la profesional ideal para consultar disponibilidad.')
+  useDocumentMeta('Profesionales | Marilyn Coiffure', 'Conocé al equipo de Marilyn Coiffure y elegí la profesional ideal para consultar disponibilidad.', '/profesionales')
 
   const filteredProfessionals = useMemo(() => {
     const normalizedQuery = normalizeText(query)

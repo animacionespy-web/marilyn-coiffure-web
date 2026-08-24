@@ -1,12 +1,11 @@
 import { siteContent } from '../data/siteContent'
 import { usePublicContent } from '../hooks/usePublicContent'
-import { AboutImageVisual } from './AboutImageVisual'
 
 export function AboutSection() {
   const { settings } = usePublicContent()
   const paragraphs = settings.aboutText.split(/\n{2,}/).filter(Boolean)
   return (
-    <section className="about section" id="salon" aria-labelledby="about-title">
+    <section className="about section" id="esencia" aria-labelledby="about-title">
       <div className="container about__grid">
         <div className="about__content">
           <p className="eyebrow">{siteContent.about.eyebrow}</p>
@@ -16,21 +15,14 @@ export function AboutSection() {
           ))}
           <ul className="quality-list" aria-label="Valores del salón">
             {siteContent.about.qualities.map((quality) => (
-              <li key={quality}>
+              <li key={quality.title}>
                 <span aria-hidden="true">✦</span>
-                {quality}
+                <div><strong>{quality.title}</strong><small>{quality.description}</small></div>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="about__visual" aria-hidden="true">
-          <AboutImageVisual
-            imageUrl={settings.footerImageUrl || '/images/home/maqueta-esencia.jpg'}
-            imageAlt="Imagen del salón Marilyn Coiffure"
-            position={{ zoom: settings.footerImageZoom, positionX: settings.footerImagePositionX, positionY: settings.footerImagePositionY }}
-          />
-        </div>
       </div>
     </section>
   )

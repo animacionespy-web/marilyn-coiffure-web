@@ -5,7 +5,7 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta'
 export function ProductsPage() {
   const { products, settings, loading, error, retry } = usePublicContent()
   const visible = products.filter((product) => product.active).sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name, 'es'))
-  useDocumentMeta('Productos para el cabello | Marilyn Coiffure', 'Conocé productos seleccionados por Marilyn Coiffure para continuar el cuidado de tu cabello en casa.')
+  useDocumentMeta('Productos para el cabello | Marilyn Coiffure', 'Conocé productos seleccionados por Marilyn Coiffure para continuar el cuidado de tu cabello en casa.', '/productos')
   return (
     <main id="contenido-principal">
       <section className="products-hero"><div className="container"><a className="catalog-back-link" href="/">← Volver al inicio</a><p className="eyebrow">Productos</p><h1>Cuidado para continuar en casa</h1><p>Una selección simple para acompañar tu rutina capilar.</p></div></section>

@@ -17,6 +17,7 @@ export function StyleDetailPage({ slug }: StyleDetailPageProps) {
   useDocumentMeta(
     style ? `${style.name} | Marilyn Coiffure` : 'Estilo no encontrado | Marilyn Coiffure',
     style?.shortDescription ?? 'Explorá el catálogo de estilos de Marilyn Coiffure.',
+    `/estilos/${slug}`,
   )
 
   const selectStyle = (selectedStyle: Style) => {

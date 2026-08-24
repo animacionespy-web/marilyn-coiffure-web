@@ -2,11 +2,12 @@ export const siteContent = {
   brand: 'Marilyn Coiffure',
   navigation: [
     { label: 'Inicio', href: '/' },
+    { label: 'Esencia', href: '/#esencia' },
     { label: 'Servicios', href: '/#servicios' },
     { label: 'Estilos', href: '/estilos' },
     { label: 'Profesionales', href: '/profesionales' },
     { label: 'Productos', href: '/productos' },
-    { label: 'Contacto', href: '/#contacto' },
+    { label: 'Equipo', href: '/#equipo' },
   ],
   actions: {
     availability: { label: 'Reservar turno', href: '/consulta' },
@@ -49,7 +50,12 @@ export const siteContent = {
       'Empezamos atendiendo a las mamás. Hoy atendemos también a sus hijas, y muchas veces las tres se sientan en la misma sala.',
       'Esa continuidad es lo que nos define: conocemos el cabello de nuestras clientas a lo largo del tiempo, no en una sola visita. Y por eso seguimos formándonos, cambiando técnicas y actualizando lo que hacemos, sin cambiar la forma en la que tratamos a la gente.',
     ],
-    qualities: ['Experiencia', 'Cercanía', 'Criterio profesional', 'Evolución'],
+    qualities: [
+      { title: 'Experiencia', description: 'Años de oficio y formación técnica constante.' },
+      { title: 'Cercanía', description: 'Te escuchamos antes de tocar tu cabello.' },
+      { title: 'Criterio profesional', description: 'Te explicamos qué conviene hacer y cuándo.' },
+      { title: 'Evolución', description: 'Técnicas y protocolos que se actualizan.' },
+    ],
   },
   contact: {
     title: '¿Lista para encontrar tu próximo estilo?',
