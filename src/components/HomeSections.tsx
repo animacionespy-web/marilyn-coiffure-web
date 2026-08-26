@@ -56,15 +56,27 @@ interface HomeSectionsEditorProps {
   onEditProduct?: (productId: string) => void
 }
 
+export function AdminVisualSectionToolbar({ id, onEdit }: { id: HomeEditorSectionId; onEdit?: (section: HomeEditorSectionId) => void }) {
+  const label = homeEditorSectionLabels[id]
+  return (
+    <div className="admin-visual-section__toolbar" data-admin-action>
+      <span className="admin-visual-section__name">{label}</span>
+      <button className="admin-visual-section__edit" type="button" onClick={() => onEdit?.(id)}>
+        <span aria-hidden="true">✎</span>
+        <span className="admin-visual-section__edit-short">Editar</span>
+        <span className="admin-visual-section__edit-long">Editar {label}</span>
+      </button>
+    </div>
+  )
+}
+
 function EditableSection({ id, editor, children }: { id: HomeEditorSectionId; editor?: HomeSectionsEditorProps; children: ReactNode }) {
   if (!editor) return <>{children}</>
   const selected = editor.selectedSection === id
   return (
     <div className={`admin-visual-section ${selected ? 'is-selected' : ''}`} data-section={id}>
+      <AdminVisualSectionToolbar id={id} onEdit={editor.onEditSection} />
       {children}
-      <button className="admin-visual-section__edit" data-admin-action type="button" onClick={() => editor.onEditSection?.(id)}>
-        <span aria-hidden="true">✎</span> Editar {homeEditorSectionLabels[id]}
-      </button>
     </div>
   )
 }

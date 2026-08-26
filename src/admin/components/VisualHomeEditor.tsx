@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent, type MouseEvent as ReactMouseEvent } from 'react'
 import { Footer } from '../../components/Footer'
-import { HomeSections, homeEditorSectionLabels, type HomeEditorSectionId } from '../../components/HomeSections'
+import { AdminVisualSectionToolbar, HomeSections, homeEditorSectionLabels, type HomeEditorSectionId } from '../../components/HomeSections'
 import { LocationMap } from '../../components/LocationMap'
 import { PublicContentPreviewProvider } from '../../hooks/usePublicContent'
 import { loadPublicContent, settingsService, type PublicContent } from '../../services/content'
@@ -182,8 +182,8 @@ export function VisualHomeEditor() {
                   }} />
                 </main>
                 <div className={`admin-visual-section ${selectedSection === 'footer' ? 'is-selected' : ''}`} data-section="footer">
+                  <AdminVisualSectionToolbar id="footer" onEdit={requestSection} />
                   <Footer />
-                  <button className="admin-visual-section__edit" data-admin-action type="button" onClick={() => requestSection('footer')}><span aria-hidden="true">✎</span> Editar Footer</button>
                 </div>
               </div>
             </PublicContentPreviewProvider>

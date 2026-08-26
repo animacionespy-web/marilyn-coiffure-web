@@ -9540,11 +9540,22 @@ button.admin-professional-work-slot:focus-visible {
   background: rgb(176 141 87 / 4%);
 }
 
-.admin-visual-section__edit {
+.admin-visual-section__toolbar {
   position: absolute;
   z-index: 55;
   top: 16px;
   right: 16px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.admin-visual-section__name,
+.admin-visual-section__edit-short {
+  display: none;
+}
+
+.admin-visual-section__edit {
   display: inline-flex;
   min-height: 42px;
   align-items: center;
@@ -9557,14 +9568,13 @@ button.admin-professional-work-slot:focus-visible {
   box-shadow: 0 9px 26px rgb(28 27 25 / 24%);
   font-size: .72rem;
   font-weight: 850;
-  opacity: 0;
-  transform: translateY(-4px);
-  transition: opacity .2s ease, transform .2s ease, background .2s ease;
+  touch-action: manipulation;
+  transition: color .2s ease, background .2s ease, border-color .2s ease;
 }
 
-.admin-visual-section:hover > .admin-visual-section__edit,
-.admin-visual-section:focus-within > .admin-visual-section__edit,
-.admin-visual-section.is-selected > .admin-visual-section__edit {
+.admin-visual-section:hover > .admin-visual-section__toolbar,
+.admin-visual-section:focus-within > .admin-visual-section__toolbar,
+.admin-visual-section.is-selected > .admin-visual-section__toolbar {
   opacity: 1;
   transform: none;
 }
@@ -9941,7 +9951,93 @@ button.admin-professional-work-slot:focus-visible {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1099px) {
+  .admin-visual-section {
+    cursor: default;
+  }
+
+  .admin-visual-section__toolbar {
+    position: relative;
+    top: auto;
+    right: auto;
+    display: flex;
+    min-height: 62px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 12px 8px 16px;
+    border-bottom: 1px solid rgb(176 141 87 / 45%);
+    color: #1c1b19;
+    background: #f4eee2;
+    box-shadow: 0 8px 22px rgb(28 27 25 / 8%);
+    opacity: 1;
+    transform: none;
+  }
+
+  .admin-visual-section__name,
+  .admin-visual-section__edit-short {
+    display: inline;
+  }
+
+  .admin-visual-section__name {
+    min-width: 0;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .admin-visual-section__edit-long {
+    display: none;
+  }
+
+  .admin-visual-section__edit {
+    min-height: 46px;
+    flex: 0 0 auto;
+    padding: 10px 17px;
+    border-color: #b08d57;
+    border-radius: 9px;
+    color: #fffdf9;
+    background: #1c1b19;
+    box-shadow: 0 7px 18px rgb(28 27 25 / 14%);
+    font-size: .95rem;
+  }
+
+  .admin-preview-card-action,
+  .admin-preview-card-actions button {
+    min-height: 44px;
+    border-radius: 8px;
+    font-size: .78rem;
+    touch-action: manipulation;
+  }
+
+  .admin-visual-editor.has-panel .admin-visual-editor__workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 820px) and (max-width: 1099px) {
+  .admin-visual-panel {
+    position: fixed;
+    z-index: 1200;
+    inset: 0 0 0 auto;
+    width: min(420px, 50vw);
+    max-height: none;
+    border-block: 0;
+    border-right: 0;
+    border-radius: 16px 0 0 16px;
+    box-shadow: -18px 0 48px rgb(28 27 25 / 22%);
+  }
+
+  .admin-visual-panel__heading {
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
+
+  .admin-visual-panel__actions {
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 819px) {
   .admin-visual-toolbar {
     position: relative;
     grid-template-columns: 1fr;
@@ -9980,13 +10076,17 @@ button.admin-professional-work-slot:focus-visible {
   .admin-visual-panel__actions {
     padding-bottom: max(18px, env(safe-area-inset-bottom));
   }
+}
+
+@media (max-width: 639px) {
+  .admin-visual-section__toolbar {
+    min-height: 66px;
+    padding-inline: 12px;
+  }
 
   .admin-visual-section__edit {
-    top: 10px;
-    right: 10px;
-    min-height: 44px;
-    opacity: 1;
-    transform: none;
+    min-height: 48px;
+    padding-inline: 16px;
   }
 }
 
