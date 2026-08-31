@@ -5,7 +5,7 @@ import type { ImagePosition } from '../../types/image'
 import { PositionedImage } from '../../components/PositionedImage'
 
 export function ImageUploadField({ folder, imageUrl, imagePosition, label, onUploaded }: {
-  folder: 'styles' | 'professionals' | 'professional-works' | 'products' | 'home'
+  folder: 'styles' | 'professionals' | 'professional-works' | 'products' | 'home' | 'categories'
   imageUrl: string
   imagePosition?: ImagePosition
   label: string

@@ -5,7 +5,7 @@ import { LocationMap } from '../../components/LocationMap'
 import { PublicContentPreviewProvider } from '../../hooks/usePublicContent'
 import { loadPublicContent, settingsService, type PublicContent } from '../../services/content'
 import { removeSiteImage } from '../../services/storage'
-import type { HomeVisualBlock, SiteSettings } from '../../types/admin'
+import type { SiteSettings } from '../../types/admin'
 import { DEFAULT_IMAGE_POSITION } from '../../types/image'
 import { AdminError, AdminLoading } from './AdminFeedback'
 import { ImagePositionEditor } from './ImagePositionEditor'
@@ -14,6 +14,7 @@ import { ImageUploadField } from './ImageUploadField'
 type PreviewMode = 'desktop' | 'mobile'
 
 const directManagement: Partial<Record<HomeEditorSectionId, { text: string; href: string }>> = {
+  services: { text: 'Administrar portadas y categorías', href: '/admin/categorias' },
   color: { text: 'Administrar estilos de color', href: '/admin/estilos' },
   process: { text: 'Administrar contenido relacionado', href: '/admin/estilos' },
   events: { text: 'Administrar peinados y eventos', href: '/admin/estilos' },
@@ -24,7 +25,7 @@ function sectionDescription(section: HomeEditorSectionId) {
   const descriptions: Partial<Record<HomeEditorSectionId, string>> = {
     hero: 'Modificá el título, la descripción y la fotografía principal.',
     essence: 'Editá la presentación y la historia del salón.',
-    services: 'Seleccioná cada bloque visual para editar su texto, imagen y enlace.',
+    services: 'Las portadas y su contenido se administran desde Categorías.',
     products: 'Los productos se administran en su catálogo y se reflejan automáticamente acá.',
     professionals: 'Las profesionales y sus trabajos reutilizan el editor completo existente.',
     transformations: 'Configurá las dos fotografías independientes de la comparación destacada de la Home.',
@@ -41,7 +42,6 @@ export function VisualHomeEditor() {
   const [savedSettings, setSavedSettings] = useState<SiteSettings | null>(null)
   const [draft, setDraft] = useState<SiteSettings | null>(null)
   const [selectedSection, setSelectedSection] = useState<HomeEditorSectionId | null>('hero')
-  const [selectedBlockId, setSelectedBlockId] = useState<HomeVisualBlock['id']>('color')
   const [previewMode, setPreviewMode] = useState<PreviewMode>('desktop')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -84,11 +84,6 @@ export function VisualHomeEditor() {
   const update = <Key extends keyof SiteSettings>(key: Key, value: SiteSettings[Key]) => {
     setMessage('')
     setDraft((current) => current ? { ...current, [key]: value } : current)
-  }
-
-  const updateBlock = (id: HomeVisualBlock['id'], patch: Partial<HomeVisualBlock>) => {
-    if (!draft) return
-    update('homeVisualBlocks', draft.homeVisualBlocks.map((block) => block.id === id ? { ...block, ...patch } : block))
   }
 
   const retirePath = (path: string) => {
@@ -151,8 +146,6 @@ export function VisualHomeEditor() {
   if (loading) return <AdminLoading label="Preparando el editor visual…" />
   if (!draft || !previewContent) return <AdminError message={error || 'No pudimos preparar el editor visual.'} onRetry={() => setRequest((value) => value + 1)} />
 
-  const selectedBlock = draft.homeVisualBlocks.find((block) => block.id === selectedBlockId) ?? draft.homeVisualBlocks[0]
-
   return (
     <section className={`admin-visual-editor ${selectedSection ? 'has-panel' : ''}`}>
       <header className="admin-visual-toolbar">
@@ -176,7 +169,6 @@ export function VisualHomeEditor() {
                   <HomeSections editor={{
                     selectedSection,
                     onEditSection: requestSection,
-                    onEditServiceBlock: (blockId) => { setSelectedBlockId(blockId as HomeVisualBlock['id']); requestSection('services') },
                     onEditProfessional: (professionalId, target) => leaveEditor(`/admin/profesionales?editar=${encodeURIComponent(professionalId)}${target === 'works' ? '&seccion=trabajos' : ''}`),
                     onEditProduct: (productId) => leaveEditor(`/admin/productos?editar=${encodeURIComponent(productId)}`),
                   }} />
@@ -205,16 +197,6 @@ export function VisualHomeEditor() {
                 {selectedSection === 'essence' && <>
                   <label>Título<input value={draft.aboutTitle} onChange={(event) => update('aboutTitle', event.target.value)} /></label>
                   <label>Presentación<textarea rows={9} value={draft.aboutText} onChange={(event) => update('aboutText', event.target.value)} /></label>
-                </>}
-
-                {selectedSection === 'services' && selectedBlock && <>
-                  <div className="admin-visual-block-tabs" role="tablist" aria-label="Bloques de servicios">{draft.homeVisualBlocks.map((block) => <button className={block.id === selectedBlock.id ? 'is-active' : ''} type="button" role="tab" aria-selected={block.id === selectedBlock.id} onClick={() => setSelectedBlockId(block.id)} key={block.id}>{block.title}</button>)}</div>
-                  <label>Etiqueta<input value={selectedBlock.eyebrow} onChange={(event) => updateBlock(selectedBlock.id, { eyebrow: event.target.value })} /></label>
-                  <label>Título<input value={selectedBlock.title} onChange={(event) => updateBlock(selectedBlock.id, { title: event.target.value })} /></label>
-                  <label>Descripción<textarea rows={4} value={selectedBlock.text} onChange={(event) => updateBlock(selectedBlock.id, { text: event.target.value })} /></label>
-                  <label>Enlace<input value={selectedBlock.href} onChange={(event) => updateBlock(selectedBlock.id, { href: event.target.value })} /></label>
-                  <ImageUploadField folder="home" label={`Imagen de ${selectedBlock.title}`} imageUrl={selectedBlock.imageUrl} imagePosition={selectedBlock.imagePosition} onUploaded={(result) => { retirePath(selectedBlock.imagePath); updateBlock(selectedBlock.id, { imageUrl: result.publicUrl, imagePath: result.path, imagePosition: { ...DEFAULT_IMAGE_POSITION } }) }} />
-                  <ImagePositionEditor usage="home-block" imageUrl={selectedBlock.imageUrl} imageAlt={`Vista previa de ${selectedBlock.title}`} value={selectedBlock.imagePosition} title={selectedBlock.title} category={selectedBlock.eyebrow} description={selectedBlock.text} onSave={(imagePosition) => updateBlock(selectedBlock.id, { imagePosition })} />
                 </>}
 
                 {selectedSection === 'location' && <>

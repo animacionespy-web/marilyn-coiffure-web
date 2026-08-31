@@ -20,6 +20,14 @@ const requiredFields: Array<keyof ConsultationFormData> = [
   'desiredTime',
 ]
 
+const errorOrder: Array<keyof ConsultationFormErrors> = [
+  'clientName',
+  'clientWhatsapp',
+  'desiredDate',
+  'desiredTime',
+  'observation',
+]
+
 export function AvailabilityForm({
   form,
   errors,
@@ -34,9 +42,13 @@ export function AvailabilityForm({
   const [attempted, setAttempted] = useState(false)
   const hasErrors = Object.keys(errors).length > 0
   const disabled = hasErrors || recipientMissing
+  const firstErrorField = errorOrder.find((field) => Boolean(errors[field]))
+  const firstError = firstErrorField ? errors[firstErrorField] : undefined
 
   const visibleError = (field: keyof ConsultationFormData) =>
-    attempted || touched[field] || (form[field] !== '' && Boolean(errors[field])) ? errors[field] : undefined
+    attempted || touched[field] || field === firstErrorField || (form[field] !== '' && Boolean(errors[field]))
+      ? errors[field]
+      : undefined
 
   const markTouched = (field: keyof ConsultationFormData) => {
     setTouched((current) => ({ ...current, [field]: true }))
@@ -182,7 +194,7 @@ export function AvailabilityForm({
         {recipientMissing
           ? 'Falta configurar el número destinatario del salón.'
           : hasErrors
-            ? 'Completá los campos obligatorios para habilitar el envío.'
+            ? firstError
             : 'El mensaje está listo para revisar y abrir en WhatsApp.'}
         {statusMessage && <strong>{statusMessage}</strong>}
       </div>

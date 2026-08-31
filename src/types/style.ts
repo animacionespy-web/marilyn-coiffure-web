@@ -1,11 +1,6 @@
 import type { ImagePosition } from './image'
 
-export type StyleCategory =
-  | 'Cortes'
-  | 'Coloración'
-  | 'Peinados'
-  | 'Quinceañeras'
-  | 'Tratamientos'
+export type StyleCategory = string
 
 export type StyleCategoryFilter = 'Todos' | StyleCategory
 
@@ -14,6 +9,7 @@ export interface Style {
   slug: string
   name: string
   category: StyleCategory
+  subcategory?: string
   shortDescription: string
   fullDescription: string
   image: string

@@ -12,7 +12,7 @@ import { ImagePositionEditor } from '../components/ImagePositionEditor'
 import { PositionedImage } from '../../components/PositionedImage'
 
 const emptyStyle: AdminStyle = {
-  id: '', categoryId: '', name: '', slug: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION }, tags: [], featured: false, active: true, displayOrder: 0, estimatedDuration: '', priceFrom: null, professionalIds: [],
+  id: '', categoryId: '', subcategoryId: null, name: '', slug: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION }, tags: [], featured: false, active: true, displayOrder: 0, estimatedDuration: '', priceFrom: null, professionalIds: [],
 }
 
 export function AdminStylesPage() {
@@ -22,7 +22,7 @@ export function AdminStylesPage() {
   const [editing, setEditing] = useState<AdminStyle | null>(null)
   const [previousImagePath, setPreviousImagePath] = useState('')
   const [query, setQuery] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState(() => new URLSearchParams(window.location.search).get('categoria') ?? '')
   const [statusFilter, setStatusFilter] = useState('all')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -40,7 +40,7 @@ export function AdminStylesPage() {
   }, [request])
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('nuevo') === '1' && !loading) setEditing({ ...emptyStyle, categoryId: categories.find((item) => item.active)?.id ?? '' })
+    if (new URLSearchParams(window.location.search).get('nuevo') === '1' && !loading) setEditing({ ...emptyStyle, categoryId: categories.find((item) => item.active && !item.parentCategoryId)?.id ?? '' })
   }, [categories, loading])
 
   useEffect(() => {
@@ -54,9 +54,14 @@ export function AdminStylesPage() {
     const text = `${style.name} ${style.slug} ${style.tags.join(' ')}`.toLocaleLowerCase('es')
     return text.includes(query.toLocaleLowerCase('es')) && (!categoryFilter || style.categoryId === categoryFilter) && (statusFilter === 'all' || (statusFilter === 'active' ? style.active : !style.active))
   }), [categoryFilter, query, statusFilter, styles])
+  const mainCategories = useMemo(() => categories.filter((category) => !category.parentCategoryId), [categories])
+  const availableSubcategories = useMemo(
+    () => categories.filter((category) => category.parentCategoryId === editing?.categoryId),
+    [categories, editing?.categoryId],
+  )
 
   const update = <Key extends keyof AdminStyle>(key: Key, value: AdminStyle[Key]) => setEditing((current) => current ? { ...current, [key]: value } : current)
-  const startNew = () => { setPreviousImagePath(''); setEditing({ ...emptyStyle, categoryId: categories.find((item) => item.active)?.id ?? '', displayOrder: styles.length + 1 }) }
+  const startNew = () => { setPreviousImagePath(''); setEditing({ ...emptyStyle, categoryId: categories.find((item) => item.active && !item.parentCategoryId)?.id ?? '', displayOrder: styles.length + 1 }) }
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -64,6 +69,7 @@ export function AdminStylesPage() {
     if (!editing.name.trim()) { setError('El nombre es obligatorio.'); return }
     if (!editing.slug.trim()) { setError('El slug es obligatorio.'); return }
     if (!editing.categoryId) { setError('Seleccioná una categoría.'); return }
+    if (editing.subcategoryId && !categories.some((category) => category.id === editing.subcategoryId && category.parentCategoryId === editing.categoryId)) { setError('La subcategoría no pertenece a la categoría principal seleccionada.'); return }
     if (!Number.isInteger(editing.displayOrder) || editing.displayOrder < 0) { setError('El orden debe ser un número entero válido.'); return }
     setSaving(true); setError(''); setMessage('')
     try {
@@ -99,7 +105,8 @@ export function AdminStylesPage() {
           <form className="admin-form" onSubmit={submit}>
             <label>Nombre *<input value={editing.name} onChange={(event) => { const previous = createSlug(editing.name); update('name', event.target.value); if (!editing.id || editing.slug === previous) update('slug', createSlug(event.target.value)) }} /></label>
             <label>Slug *<input value={editing.slug} onChange={(event) => update('slug', createSlug(event.target.value))} /></label>
-            <label>Categoría *<select value={editing.categoryId} onChange={(event) => update('categoryId', event.target.value)}><option value="">Seleccionar</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}{category.active ? '' : ' (inactiva)'}</option>)}</select></label>
+            <label>Categoría principal *<select value={editing.categoryId} onChange={(event) => setEditing((current) => current ? { ...current, categoryId: event.target.value, subcategoryId: null } : current)}><option value="">Seleccionar</option>{mainCategories.map((category) => <option key={category.id} value={category.id}>{category.name}{category.active ? '' : ' (inactiva)'}</option>)}</select></label>
+            <label>Subcategoría<select value={editing.subcategoryId ?? ''} onChange={(event) => update('subcategoryId', event.target.value || null)} disabled={!editing.categoryId || availableSubcategories.length === 0}><option value="">{availableSubcategories.length ? 'Sin subcategoría' : 'Esta categoría no tiene subcategorías'}</option>{availableSubcategories.map((category) => <option key={category.id} value={category.id}>{category.name}{category.active ? '' : ' (inactiva)'}</option>)}</select></label>
             <label>Orden<input type="number" min="0" step="1" value={editing.displayOrder} onChange={(event) => update('displayOrder', Number(event.target.value))} /></label>
             <label className="admin-form__wide">Descripción corta<textarea rows={2} maxLength={220} value={editing.shortDescription} onChange={(event) => update('shortDescription', event.target.value)} /></label>
             <label className="admin-form__wide">Descripción completa<textarea rows={5} value={editing.fullDescription} onChange={(event) => update('fullDescription', event.target.value)} /></label>
@@ -116,8 +123,8 @@ export function AdminStylesPage() {
         </section>
       )}
       <section className="admin-panel">
-        <div className="admin-toolbar"><label>Buscar<input type="search" placeholder="Nombre, slug o etiqueta" value={query} onChange={(event) => setQuery(event.target.value)} /></label><label>Categoría<select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}><option value="">Todas</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label><label>Estado<select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">Todos</option><option value="active">Activos</option><option value="inactive">Inactivos</option></select></label></div>
-        {loading ? <AdminLoading /> : filtered.length === 0 ? <AdminEmpty message="No hay estilos con esos criterios." /> : <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Estilo</th><th>Categoría</th><th>Estado</th><th>Destacado</th><th>Orden</th><th>Acciones</th></tr></thead><tbody>{filtered.map((style) => <tr key={style.id}><td data-label="Estilo"><div className="admin-entity"><div className="admin-entity__image">{style.imageUrl ? <PositionedImage src={style.imageUrl} alt="" position={style.imagePosition} /> : <span>MC</span>}</div><div><strong>{style.name}</strong><small>{style.slug}</small></div></div></td><td data-label="Categoría">{categories.find((item) => item.id === style.categoryId)?.name ?? 'Sin categoría'}</td><td data-label="Estado"><button className={`admin-status ${style.active ? 'is-active' : ''}`} onClick={() => toggle(style, 'active')}>{style.active ? 'Activo' : 'Inactivo'}</button></td><td data-label="Destacado"><button className={`admin-status ${style.featured ? 'is-featured' : ''}`} onClick={() => toggle(style, 'featured')}>{style.featured ? 'Sí' : 'No'}</button></td><td data-label="Orden">{style.displayOrder}</td><td data-label="Acciones"><div className="admin-row-actions"><button onClick={() => setEditing(style)}>Editar</button><button className="is-danger" onClick={() => remove(style)}>Eliminar</button></div></td></tr>)}</tbody></table></div>}
+        <div className="admin-toolbar"><label>Buscar<input type="search" placeholder="Nombre, slug o etiqueta" value={query} onChange={(event) => setQuery(event.target.value)} /></label><label>Categoría<select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}><option value="">Todas</option>{mainCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label><label>Estado<select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">Todos</option><option value="active">Activos</option><option value="inactive">Inactivos</option></select></label></div>
+        {loading ? <AdminLoading /> : filtered.length === 0 ? <AdminEmpty message="No hay estilos con esos criterios." /> : <div className="admin-style-cards">{filtered.map((style) => { const main = categories.find((item) => item.id === style.categoryId); const child = categories.find((item) => item.id === style.subcategoryId); return <article className="admin-style-card" key={style.id}><div className="admin-style-card__image">{style.imageUrl ? <PositionedImage src={style.imageUrl} alt="" position={style.imagePosition} /> : <span>MC</span>}</div><div className="admin-style-card__content"><p>{child ? `${main?.name ?? 'Sin categoría'} · ${child.name}` : main?.name ?? 'Sin categoría'}</p><h3>{style.name}</h3><small>{style.slug}</small><div className="admin-style-card__statuses"><button className={`admin-status ${style.active ? 'is-active' : ''}`} onClick={() => toggle(style, 'active')}>{style.active ? 'Visible' : 'Oculto'}</button><button className={`admin-status ${style.featured ? 'is-featured' : ''}`} onClick={() => toggle(style, 'featured')}>{style.featured ? 'Destacado' : 'No destacado'}</button><span>Orden {style.displayOrder}</span></div><div className="admin-row-actions"><button onClick={() => setEditing(style)}>Editar</button><button className="is-danger" onClick={() => remove(style)}>Eliminar</button></div></div></article> })}</div>}
       </section>
     </>
   )

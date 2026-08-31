@@ -87,8 +87,18 @@ export function CatalogPage() {
 
   const categoryOptions = useMemo<StyleCategoryFilter[]>(() => [
     'Todos',
-    ...Array.from(new Set((categories.length ? categories.map((item) => item.name) : styles.map((item) => item.category)))) as StyleCategoryFilter[],
+    ...Array.from(new Set((categories.length ? categories.filter((item) => !item.parentCategoryId).map((item) => item.name) : styles.map((item) => item.category)))) as StyleCategoryFilter[],
   ], [categories, styles])
+
+  useEffect(() => {
+    if (loading) return
+    const requestedCategory = new URLSearchParams(window.location.search).get('categoria')
+    if (!requestedCategory) return
+    const matchingCategory = categoryOptions.find(
+      (category) => normalizeText(category) === normalizeText(requestedCategory),
+    )
+    if (matchingCategory) setSelectedCategory(matchingCategory)
+  }, [categoryOptions, loading])
 
   const resetFilters = () => {
     setSelectedCategory('Todos')

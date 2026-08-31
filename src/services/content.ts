@@ -24,7 +24,7 @@ import type {
   DatabaseSettingRow,
   DatabaseStyleRow,
 } from '../types/database'
-import { humanizeDataError } from '../utils/admin'
+import { humanizeDataError, logDataError } from '../utils/admin'
 import { normalizeImagePosition } from '../types/image'
 
 interface StyleProfessionalRow {
@@ -89,10 +89,20 @@ const sortByOrderAndName = <Item extends { displayOrder: number; name: string }>
 function mapCategory(row: DatabaseCategoryRow): Category {
   return {
     id: row.id,
+    parentCategoryId: row.parent_category_id,
     name: row.name,
     slug: row.slug,
     description: row.description ?? '',
     icon: row.icon ?? '',
+    coverImageUrl: row.cover_image_url ?? '',
+    coverImagePath: row.cover_image_path ?? '',
+    coverImagePosition: normalizeImagePosition({
+      zoom: row.cover_image_zoom ?? 1,
+      positionX: row.cover_image_position_x ?? 50,
+      positionY: row.cover_image_position_y ?? 50,
+    }),
+    ctaLabel: row.cta_label ?? '',
+    ctaHref: row.cta_href ?? '',
     active: row.active,
     displayOrder: row.display_order,
     createdAt: row.created_at,
@@ -104,6 +114,7 @@ function mapAdminStyle(row: DatabaseStyleRow, professionalIds: string[]): AdminS
   return {
     id: row.id,
     categoryId: row.category_id,
+    subcategoryId: row.subcategory_id,
     name: row.name,
     slug: row.slug,
     shortDescription: row.short_description ?? '',
@@ -215,10 +226,18 @@ export const categoriesService = {
     const client = requireSupabase()
     const payload = {
       id: category.id || undefined,
+      parent_category_id: category.parentCategoryId,
       name: category.name.trim(),
       slug: category.slug.trim(),
       description: category.description.trim() || null,
       icon: category.icon.trim() || null,
+      cover_image_url: category.coverImageUrl || null,
+      cover_image_path: category.coverImagePath || null,
+      cover_image_zoom: category.coverImagePosition.zoom,
+      cover_image_position_x: category.coverImagePosition.positionX,
+      cover_image_position_y: category.coverImagePosition.positionY,
+      cta_label: category.ctaLabel.trim() || null,
+      cta_href: category.ctaHref.trim() || null,
       active: category.active,
       display_order: category.displayOrder,
     }
@@ -228,10 +247,16 @@ export const categoriesService = {
   },
   async remove(categoryId: string) {
     const client = requireSupabase()
+    const { count: childCount, error: childError } = await client
+      .from('categories')
+      .select('id', { count: 'exact', head: true })
+      .eq('parent_category_id', categoryId)
+    if (childError) throw new Error('No se pudieron verificar las subcategorías relacionadas.')
+    if ((childCount ?? 0) > 0) throw new Error('Esta categoría tiene subcategorías. Eliminá o reasigná primero esas subcategorías.')
     const { count, error: countError } = await client
       .from('styles')
       .select('id', { count: 'exact', head: true })
-      .eq('category_id', categoryId)
+      .or(`category_id.eq.${categoryId},subcategory_id.eq.${categoryId}`)
     if (countError) throw new Error('No se pudo verificar el contenido relacionado.')
     if ((count ?? 0) > 0) throw new Error('Esta categoría tiene estilos asociados. Desactivala o reasigná esos estilos antes de eliminarla.')
     const { error } = await client.from('categories').delete().eq('id', categoryId)
@@ -257,6 +282,7 @@ export const stylesService = {
     const payload = {
       id: style.id || undefined,
       category_id: style.categoryId,
+      subcategory_id: style.subcategoryId,
       name: style.name.trim(),
       slug: style.slug.trim(),
       short_description: style.shortDescription.trim() || null,
@@ -273,16 +299,55 @@ export const stylesService = {
       estimated_duration: style.estimatedDuration.trim() || null,
       price_from: style.priceFrom,
     }
-    const { data, error } = await client.from('styles').upsert(payload).select('*').single()
-    if (error) throw new Error(humanizeDataError(error, 'No se pudo guardar el estilo.'))
+    let duplicateQuery = client.from('styles').select('id').eq('slug', payload.slug)
+    if (style.id) duplicateQuery = duplicateQuery.neq('id', style.id)
+    const { data: duplicate, error: duplicateError } = await duplicateQuery.maybeSingle()
+    if (duplicateError) {
+      logDataError('No se pudo validar el slug del estilo', duplicateError)
+      throw new Error(humanizeDataError(duplicateError, 'No se pudo validar el slug del estilo.'))
+    }
+    if (duplicate) throw new Error('Ya existe un contenido con ese slug.')
+
+    const mutation = style.id
+      ? client.from('styles').update(payload).eq('id', style.id)
+      : client.from('styles').insert(payload)
+    const { data, error } = await mutation.select('*').single()
+    if (error) {
+      logDataError(style.id ? 'Falló la actualización de styles' : 'Falló la creación de styles', error)
+      throw new Error(humanizeDataError(error, 'No se pudo guardar el estilo.'))
+    }
     const saved = data as DatabaseStyleRow
-    const { error: deleteError } = await client.from('style_professionals').delete().eq('style_id', saved.id)
-    if (deleteError) throw new Error('El estilo se guardó, pero no se pudieron actualizar sus profesionales.')
-    if (style.professionalIds.length) {
+    const { data: currentRelations, error: relationsReadError } = await client
+      .from('style_professionals')
+      .select('professional_id')
+      .eq('style_id', saved.id)
+    if (relationsReadError) {
+      logDataError('El estilo se guardó, pero falló la lectura de style_professionals', relationsReadError)
+      throw new Error('El estilo se guardó, pero no se pudieron verificar sus profesionales.')
+    }
+    const currentIds = new Set((currentRelations ?? []).map((relation) => relation.professional_id as string))
+    const requestedIds = new Set(style.professionalIds)
+    const removedIds = [...currentIds].filter((professionalId) => !requestedIds.has(professionalId))
+    const addedIds = [...requestedIds].filter((professionalId) => !currentIds.has(professionalId))
+    if (removedIds.length) {
+      const { error: deleteError } = await client
+        .from('style_professionals')
+        .delete()
+        .eq('style_id', saved.id)
+        .in('professional_id', removedIds)
+      if (deleteError) {
+        logDataError('El estilo se guardó, pero falló la eliminación en style_professionals', deleteError)
+        throw new Error('El estilo se guardó, pero no se pudieron actualizar sus profesionales.')
+      }
+    }
+    if (addedIds.length) {
       const { error: relationError } = await client.from('style_professionals').insert(
-        style.professionalIds.map((professionalId) => ({ style_id: saved.id, professional_id: professionalId })),
+        addedIds.map((professionalId) => ({ style_id: saved.id, professional_id: professionalId })),
       )
-      if (relationError) throw new Error('El estilo se guardó, pero no se pudieron actualizar sus profesionales.')
+      if (relationError) {
+        logDataError('El estilo se guardó, pero falló la inserción en style_professionals', relationError)
+        throw new Error('El estilo se guardó, pero no se pudieron actualizar sus profesionales.')
+      }
     }
     return mapAdminStyle(saved, style.professionalIds)
   },
@@ -520,13 +585,17 @@ export interface PublicContent {
 }
 
 function toPublicStyle(style: AdminStyle, categories: Category[]): Style | null {
-  const category = categories.find((item) => item.id === style.categoryId)
+  const category = categories.find((item) => item.id === style.categoryId && !item.parentCategoryId)
   if (!category) return null
+  const subcategory = style.subcategoryId
+    ? categories.find((item) => item.id === style.subcategoryId && item.parentCategoryId === category.id)
+    : undefined
   return {
     id: style.id,
     slug: style.slug,
     name: style.name,
     category: category.name as StyleCategory,
+    subcategory: subcategory?.name,
     shortDescription: style.shortDescription,
     fullDescription: style.fullDescription,
     image: style.imageUrl || '/images/styles/corte-bob.svg',

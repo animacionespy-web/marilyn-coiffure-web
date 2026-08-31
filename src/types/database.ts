@@ -1,9 +1,17 @@
 export interface DatabaseCategoryRow {
   id: string
+  parent_category_id: string | null
   name: string
   slug: string
   description: string | null
   icon: string | null
+  cover_image_url: string | null
+  cover_image_path: string | null
+  cover_image_zoom: number | null
+  cover_image_position_x: number | null
+  cover_image_position_y: number | null
+  cta_label: string | null
+  cta_href: string | null
   active: boolean
   display_order: number
   created_at: string
@@ -13,6 +21,7 @@ export interface DatabaseCategoryRow {
 export interface DatabaseStyleRow {
   id: string
   category_id: string
+  subcategory_id: string | null
   name: string
   slug: string
   short_description: string | null

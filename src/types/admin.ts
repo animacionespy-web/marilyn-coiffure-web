@@ -13,10 +13,16 @@ export interface Profile {
 
 export interface Category {
   id: string
+  parentCategoryId: string | null
   name: string
   slug: string
   description: string
   icon: string
+  coverImageUrl: string
+  coverImagePath: string
+  coverImagePosition: ImagePosition
+  ctaLabel: string
+  ctaHref: string
   active: boolean
   displayOrder: number
   createdAt?: string
@@ -26,6 +32,7 @@ export interface Category {
 export interface AdminStyle {
   id: string
   categoryId: string
+  subcategoryId: string | null
   name: string
   slug: string
   shortDescription: string
