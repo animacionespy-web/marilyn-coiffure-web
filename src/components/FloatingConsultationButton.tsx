@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react'
+import { siteConfig } from '../config/site'
+import { usePublicContent } from '../hooks/usePublicContent'
+import { buildWhatsappUrl } from '../utils/consultation'
 
 export function FloatingConsultationButton() {
+  const { settings } = usePublicContent()
   const [visible, setVisible] = useState(false)
   const [nearFinalCta, setNearFinalCta] = useState(false)
+  const whatsappUrl = buildWhatsappUrl(
+    settings.generalWhatsappNumber,
+    siteConfig.consultation.directWhatsappMessage,
+  )
 
   useEffect(() => {
     const finalCta = document.querySelector('#contacto')
@@ -15,10 +23,18 @@ export function FloatingConsultationButton() {
     return () => window.removeEventListener('scroll', updateVisibility)
   }, [])
 
+  if (!whatsappUrl) return null
+
   return (
-    <a className={`floating-consultation ${visible && !nearFinalCta ? 'is-visible' : ''}`} href="/consulta" aria-label="Reservar turno">
+    <a
+      className={`floating-consultation ${visible && !nearFinalCta ? 'is-visible' : ''}`}
+      href={whatsappUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Consultar disponibilidad por WhatsApp"
+    >
       <span aria-hidden="true">✦</span>
-      Reservar turno
+      Consultar por WhatsApp
     </a>
   )
 }
