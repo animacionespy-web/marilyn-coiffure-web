@@ -24,7 +24,7 @@ import type {
   DatabaseSettingRow,
   DatabaseStyleRow,
 } from '../types/database'
-import { humanizeDataError, logDataError } from '../utils/admin'
+import { createUniqueSlug, humanizeDataError, logDataError } from '../utils/admin'
 import { normalizeImagePosition } from '../types/image'
 
 interface StyleProfessionalRow {
@@ -428,9 +428,7 @@ export const productsService = {
     if (product.price !== null && product.price < 0) throw new Error('El precio no puede ser negativo.')
     const client = requireSupabase()
     const payload = {
-      id: product.id || undefined,
       name: product.name.trim(),
-      slug: product.slug.trim(),
       category: product.category.trim() || null,
       short_description: product.shortDescription.trim() || null,
       full_description: product.fullDescription.trim() || null,
@@ -445,9 +443,28 @@ export const productsService = {
       price: product.price,
       stock_status: product.stockStatus.trim() || null,
     }
-    const { data, error } = await client.from('products').upsert(payload).select('*').single()
-    if (error) throw new Error(humanizeDataError(error, 'No se pudo guardar el producto.'))
-    return mapAdminProduct(data as DatabaseProductRow)
+
+    if (product.id) {
+      const { data, error } = await client.from('products').update(payload).eq('id', product.id).select('*').single()
+      if (error) throw new Error(humanizeDataError(error, 'No se pudo guardar el producto.'))
+      return mapAdminProduct(data as DatabaseProductRow)
+    }
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const baseSlug = createUniqueSlug(product.name, [])
+      const { data: slugRows, error: slugError } = await client
+        .from('products')
+        .select('slug')
+        .like('slug', `${baseSlug}%`)
+      if (slugError) throw new Error(humanizeDataError(slugError, 'No se pudo generar el identificador del producto.'))
+
+      const slug = createUniqueSlug(product.name, ((slugRows ?? []) as Array<{ slug: string }>).map((row) => row.slug))
+      const { data, error } = await client.from('products').insert({ ...payload, slug }).select('*').single()
+      if (!error) return mapAdminProduct(data as DatabaseProductRow)
+      if (error.code !== '23505') throw new Error(humanizeDataError(error, 'No se pudo guardar el producto.'))
+    }
+
+    throw new Error('No se pudo generar un identificador único. Intentá guardar nuevamente.')
   },
   async remove(product: AdminProduct) {
     const client = requireSupabase()

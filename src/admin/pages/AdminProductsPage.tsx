@@ -3,7 +3,6 @@ import { useDocumentMeta } from '../../hooks/useDocumentMeta'
 import { productsService } from '../../services/content'
 import { removeSiteImage } from '../../services/storage'
 import type { AdminProduct } from '../../types/admin'
-import { createSlug } from '../../utils/admin'
 import { AdminEmpty, AdminError, AdminLoading } from '../components/AdminFeedback'
 import { AdminPageHeader } from '../components/AdminPageHeader'
 import { ImageUploadField } from '../components/ImageUploadField'
@@ -63,7 +62,6 @@ export function AdminProductsPage() {
     event.preventDefault()
     if (!editing) return
     if (!editing.name.trim()) { setError('El nombre es obligatorio.'); return }
-    if (!editing.slug.trim()) { setError('El slug es obligatorio.'); return }
     if (!editing.category.trim()) { setError('La categoría es obligatoria.'); return }
     if (!Number.isInteger(editing.displayOrder) || editing.displayOrder < 0) { setError('El orden debe ser un número entero válido.'); return }
     if (editing.price !== null && editing.price < 0) { setError('El precio no puede ser negativo.'); return }
@@ -103,8 +101,7 @@ export function AdminProductsPage() {
     {editing && <section className="admin-panel admin-editor" aria-labelledby="product-form-title">
       <div className="admin-panel__heading"><div><p className="eyebrow">Editor</p><h2 id="product-form-title">{editing.id ? 'Editar producto' : 'Nuevo producto'}</h2></div></div>
       <form className="admin-form" onSubmit={submit}>
-        <label>Nombre *<input value={editing.name} onChange={(event) => { const previous = createSlug(editing.name); update('name', event.target.value); if (!editing.id || editing.slug === previous) update('slug', createSlug(event.target.value)) }} /></label>
-        <label>Slug *<input value={editing.slug} onChange={(event) => update('slug', createSlug(event.target.value))} /></label>
+        <label>Nombre *<input value={editing.name} onChange={(event) => update('name', event.target.value)} /></label>
         <label>Categoría *<input value={editing.category} onChange={(event) => update('category', event.target.value)} /></label>
         <label>Orden<input type="number" min="0" step="1" value={editing.displayOrder} onChange={(event) => update('displayOrder', Number(event.target.value))} /></label>
         <label className="admin-form__wide">Descripción corta<textarea rows={2} maxLength={180} value={editing.shortDescription} onChange={(event) => update('shortDescription', event.target.value)} /></label>
@@ -119,8 +116,8 @@ export function AdminProductsPage() {
       </form>
     </section>}
     <section className="admin-panel">
-      <div className="admin-toolbar"><label>Buscar<input type="search" placeholder="Nombre, categoría o slug" value={query} onChange={(event) => setQuery(event.target.value)} /></label></div>
-      {loading ? <AdminLoading /> : filtered.length === 0 ? <AdminEmpty message="No hay productos con esos criterios." /> : <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Producto</th><th>Categoría</th><th>Estado</th><th>Destacado</th><th>Orden</th><th>Acciones</th></tr></thead><tbody>{filtered.map((product) => <tr key={product.id}><td data-label="Producto"><div className="admin-entity"><div className="admin-entity__image">{product.imageUrl ? <PositionedImage src={product.imageUrl} alt="" position={product.imagePosition} /> : <span>MC</span>}</div><div><strong>{product.name}</strong><small>{product.slug}</small></div></div></td><td data-label="Categoría">{product.category}</td><td data-label="Estado"><button className={`admin-status ${product.active ? 'is-active' : ''}`} onClick={() => toggle(product, 'active')}>{product.active ? 'Activo' : 'Inactivo'}</button></td><td data-label="Destacado"><button className={`admin-status ${product.featured ? 'is-featured' : ''}`} onClick={() => toggle(product, 'featured')}>{product.featured ? 'Sí' : 'No'}</button></td><td data-label="Orden">{product.displayOrder}</td><td data-label="Acciones"><div className="admin-row-actions"><button onClick={() => { setEditing(product); setError(''); setPreviousImagePath('') }}>Editar</button><button className="is-danger" onClick={() => remove(product)}>Eliminar</button></div></td></tr>)}</tbody></table></div>}
+      <div className="admin-toolbar"><label>Buscar<input type="search" placeholder="Nombre o categoría" value={query} onChange={(event) => setQuery(event.target.value)} /></label></div>
+      {loading ? <AdminLoading /> : filtered.length === 0 ? <AdminEmpty message="No hay productos con esos criterios." /> : <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Producto</th><th>Categoría</th><th>Estado</th><th>Destacado</th><th>Orden</th><th>Acciones</th></tr></thead><tbody>{filtered.map((product) => <tr key={product.id}><td data-label="Producto"><div className="admin-entity"><div className="admin-entity__image">{product.imageUrl ? <PositionedImage src={product.imageUrl} alt="" position={product.imagePosition} /> : <span>MC</span>}</div><div><strong>{product.name}</strong></div></div></td><td data-label="Categoría">{product.category}</td><td data-label="Estado"><button className={`admin-status ${product.active ? 'is-active' : ''}`} onClick={() => toggle(product, 'active')}>{product.active ? 'Activo' : 'Inactivo'}</button></td><td data-label="Destacado"><button className={`admin-status ${product.featured ? 'is-featured' : ''}`} onClick={() => toggle(product, 'featured')}>{product.featured ? 'Sí' : 'No'}</button></td><td data-label="Orden">{product.displayOrder}</td><td data-label="Acciones"><div className="admin-row-actions"><button onClick={() => { setEditing(product); setError(''); setPreviousImagePath('') }}>Editar</button><button className="is-danger" onClick={() => remove(product)}>Eliminar</button></div></td></tr>)}</tbody></table></div>}
     </section>
   </>
 }
