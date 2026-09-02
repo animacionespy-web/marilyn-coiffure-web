@@ -9,9 +9,10 @@ import { ImageUploadField } from '../components/ImageUploadField'
 import { ImagePositionEditor } from '../components/ImagePositionEditor'
 import { DEFAULT_IMAGE_POSITION } from '../../types/image'
 import { PositionedImage } from '../../components/PositionedImage'
+import { createUniqueSlug } from '../../utils/admin'
 
 const emptyProduct: AdminProduct = {
-  id: '', name: '', slug: '', category: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION }, featured: false, active: true, displayOrder: 0, price: null, stockStatus: '',
+  id: '', name: '', slug: '', category: '', lineName: '', shortDescription: '', fullDescription: '', imageUrl: '', imagePath: '', imagePosition: { ...DEFAULT_IMAGE_POSITION }, featured: false, active: true, displayOrder: 0, price: null, stockStatus: '',
 }
 
 export function AdminProductsPage() {
@@ -54,7 +55,15 @@ export function AdminProductsPage() {
     return () => window.removeEventListener('beforeunload', warn)
   }, [editing])
 
-  const filtered = useMemo(() => products.filter((product) => `${product.name} ${product.category} ${product.slug}`.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es'))), [products, query])
+  const filtered = useMemo(() => products.filter((product) => `${product.name} ${product.category} ${product.lineName}`.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es'))), [products, query])
+  const displayedSlug = useMemo(() => {
+    if (!editing) return ''
+    if (editing.id) return editing.slug
+    return createUniqueSlug(
+      [editing.category, editing.lineName, editing.name].map((value) => value.trim()).filter(Boolean).join(' '),
+      products.map((product) => product.slug),
+    )
+  }, [editing, products])
   const update = <Key extends keyof AdminProduct>(key: Key, value: AdminProduct[Key]) => setEditing((current) => current ? { ...current, [key]: value } : current)
   const sortProducts = (items: AdminProduct[]) => items.sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name, 'es'))
 
@@ -63,6 +72,7 @@ export function AdminProductsPage() {
     if (!editing) return
     if (!editing.name.trim()) { setError('El nombre es obligatorio.'); return }
     if (!editing.category.trim()) { setError('La categoría es obligatoria.'); return }
+    if (!editing.lineName.trim()) { setError('La línea es obligatoria para productos nuevos o actualizados.'); return }
     if (!Number.isInteger(editing.displayOrder) || editing.displayOrder < 0) { setError('El orden debe ser un número entero válido.'); return }
     if (editing.price !== null && editing.price < 0) { setError('El precio no puede ser negativo.'); return }
     setSaving(true); setError(''); setMessage('')
@@ -100,9 +110,11 @@ export function AdminProductsPage() {
     {error && !editing && <AdminError message={error} onRetry={() => setRequest((value) => value + 1)} />}
     {editing && <section className="admin-panel admin-editor" aria-labelledby="product-form-title">
       <div className="admin-panel__heading"><div><p className="eyebrow">Editor</p><h2 id="product-form-title">{editing.id ? 'Editar producto' : 'Nuevo producto'}</h2></div></div>
-      <form className="admin-form" onSubmit={submit}>
-        <label>Nombre *<input value={editing.name} onChange={(event) => update('name', event.target.value)} /></label>
-        <label>Categoría *<input value={editing.category} onChange={(event) => update('category', event.target.value)} /></label>
+      <form className="admin-form admin-product-form" onSubmit={submit}>
+        <label>Marca / Categoría *<input value={editing.category} onChange={(event) => update('category', event.target.value)} placeholder="Ej.: Kérastase" /></label>
+        <label>Línea *<input value={editing.lineName} onChange={(event) => update('lineName', event.target.value)} placeholder="Ej.: Chroma Absolu" /></label>
+        <label>Nombre del producto *<input value={editing.name} onChange={(event) => update('name', event.target.value)} placeholder="Ej.: Serum Chroma Thermique" /></label>
+        <label>Slug técnico<input value={displayedSlug} readOnly aria-readonly="true" /><small>Se genera automáticamente. Al editar, se conserva para no romper enlaces.</small></label>
         <label>Orden<input type="number" min="0" step="1" value={editing.displayOrder} onChange={(event) => update('displayOrder', Number(event.target.value))} /></label>
         <label className="admin-form__wide">Descripción corta<textarea rows={2} maxLength={180} value={editing.shortDescription} onChange={(event) => update('shortDescription', event.target.value)} /></label>
         <label className="admin-form__wide">Descripción completa<textarea rows={4} value={editing.fullDescription} onChange={(event) => update('fullDescription', event.target.value)} /></label>
@@ -116,8 +128,8 @@ export function AdminProductsPage() {
       </form>
     </section>}
     <section className="admin-panel">
-      <div className="admin-toolbar"><label>Buscar<input type="search" placeholder="Nombre o categoría" value={query} onChange={(event) => setQuery(event.target.value)} /></label></div>
-      {loading ? <AdminLoading /> : filtered.length === 0 ? <AdminEmpty message="No hay productos con esos criterios." /> : <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Producto</th><th>Categoría</th><th>Estado</th><th>Destacado</th><th>Orden</th><th>Acciones</th></tr></thead><tbody>{filtered.map((product) => <tr key={product.id}><td data-label="Producto"><div className="admin-entity"><div className="admin-entity__image">{product.imageUrl ? <PositionedImage src={product.imageUrl} alt="" position={product.imagePosition} /> : <span>MC</span>}</div><div><strong>{product.name}</strong></div></div></td><td data-label="Categoría">{product.category}</td><td data-label="Estado"><button className={`admin-status ${product.active ? 'is-active' : ''}`} onClick={() => toggle(product, 'active')}>{product.active ? 'Activo' : 'Inactivo'}</button></td><td data-label="Destacado"><button className={`admin-status ${product.featured ? 'is-featured' : ''}`} onClick={() => toggle(product, 'featured')}>{product.featured ? 'Sí' : 'No'}</button></td><td data-label="Orden">{product.displayOrder}</td><td data-label="Acciones"><div className="admin-row-actions"><button onClick={() => { setEditing(product); setError(''); setPreviousImagePath('') }}>Editar</button><button className="is-danger" onClick={() => remove(product)}>Eliminar</button></div></td></tr>)}</tbody></table></div>}
+      <div className="admin-toolbar"><label>Buscar<input type="search" placeholder="Nombre, marca o línea" value={query} onChange={(event) => setQuery(event.target.value)} /></label></div>
+      {loading ? <AdminLoading /> : filtered.length === 0 ? <AdminEmpty message="No hay productos con esos criterios." /> : <div className="admin-table-wrap"><table className="admin-table admin-products-table"><thead><tr><th>Producto</th><th>Marca</th><th>Línea</th><th>Estado</th><th>Destacado</th><th>Orden</th><th>Acciones</th></tr></thead><tbody>{filtered.map((product) => <tr key={product.id}><td data-label="Producto"><div className="admin-entity"><div className="admin-entity__image">{product.imageUrl ? <PositionedImage src={product.imageUrl} alt="" position={product.imagePosition} /> : <span>MC</span>}</div><div><strong>{product.name}</strong></div></div></td><td data-label="Marca">{product.category}</td><td data-label="Línea">{product.lineName || <span className="admin-muted">Pendiente</span>}</td><td data-label="Estado"><button className={`admin-status ${product.active ? 'is-active' : ''}`} onClick={() => toggle(product, 'active')}>{product.active ? 'Activo' : 'Inactivo'}</button></td><td data-label="Destacado"><button className={`admin-status ${product.featured ? 'is-featured' : ''}`} onClick={() => toggle(product, 'featured')}>{product.featured ? 'Sí' : 'No'}</button></td><td data-label="Orden">{product.displayOrder}</td><td data-label="Acciones"><div className="admin-row-actions"><button onClick={() => { setEditing(product); setError(''); setPreviousImagePath('') }}>Editar</button><button className="is-danger" onClick={() => remove(product)}>Eliminar</button></div></td></tr>)}</tbody></table></div>}
     </section>
   </>
 }

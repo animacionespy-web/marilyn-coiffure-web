@@ -5,7 +5,7 @@ import { siteContent } from '../data/siteContent'
 import { styles as fallbackStyles } from '../data/styles'
 import { requireSupabase, supabaseConfiguration } from '../lib/supabase'
 import type { Professional, ProfessionalSpecialty, ProfessionalWork } from '../types/professional'
-import type { Product, ProductCategory } from '../types/product'
+import type { Product } from '../types/product'
 import type { Style, StyleCategory } from '../types/style'
 import type {
   AdminProfessional,
@@ -189,6 +189,7 @@ function mapAdminProduct(row: DatabaseProductRow): AdminProduct {
     name: row.name,
     slug: row.slug,
     category: row.category ?? '',
+    lineName: row.line_name ?? '',
     shortDescription: row.short_description ?? '',
     fullDescription: row.full_description ?? '',
     imageUrl: row.image_url ?? '',
@@ -430,6 +431,7 @@ export const productsService = {
     const payload = {
       name: product.name.trim(),
       category: product.category.trim() || null,
+      line_name: product.lineName.trim() || null,
       short_description: product.shortDescription.trim() || null,
       full_description: product.fullDescription.trim() || null,
       image_url: product.imageUrl || null,
@@ -451,14 +453,18 @@ export const productsService = {
     }
 
     for (let attempt = 0; attempt < 5; attempt += 1) {
-      const baseSlug = createUniqueSlug(product.name, [])
+      const slugSource = [product.category, product.lineName, product.name]
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .join(' ')
+      const baseSlug = createUniqueSlug(slugSource, [])
       const { data: slugRows, error: slugError } = await client
         .from('products')
         .select('slug')
         .like('slug', `${baseSlug}%`)
       if (slugError) throw new Error(humanizeDataError(slugError, 'No se pudo generar el identificador del producto.'))
 
-      const slug = createUniqueSlug(product.name, ((slugRows ?? []) as Array<{ slug: string }>).map((row) => row.slug))
+      const slug = createUniqueSlug(slugSource, ((slugRows ?? []) as Array<{ slug: string }>).map((row) => row.slug))
       const { data, error } = await client.from('products').insert({ ...payload, slug }).select('*').single()
       if (!error) return mapAdminProduct(data as DatabaseProductRow)
       if (error.code !== '23505') throw new Error(humanizeDataError(error, 'No se pudo guardar el producto.'))
@@ -681,7 +687,8 @@ function toPublicProduct(product: AdminProduct): Product {
     id: product.id,
     slug: product.slug,
     name: product.name,
-    category: product.category as ProductCategory,
+    category: product.category,
+    lineName: product.lineName,
     shortDescription: product.shortDescription,
     fullDescription: product.fullDescription,
     image: product.imageUrl || '/images/products/tratamiento.svg',

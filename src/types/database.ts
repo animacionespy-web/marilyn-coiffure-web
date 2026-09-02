@@ -89,6 +89,7 @@ export interface DatabaseProductRow {
   name: string
   slug: string
   category: string | null
+  line_name: string | null
   short_description: string | null
   full_description: string | null
   image_url: string | null

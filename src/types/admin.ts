@@ -93,6 +93,7 @@ export interface AdminProduct {
   name: string
   slug: string
   category: string
+  lineName: string
   shortDescription: string
   fullDescription: string
   imageUrl: string
