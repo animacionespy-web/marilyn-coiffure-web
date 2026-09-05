@@ -8588,30 +8588,50 @@ button.admin-professional-work-slot:focus-visible {
 }
 
 @media (max-width: 1023px) {
+  /* A filtered ancestor traps a fixed menu inside the header on mobile. */
+  .site-header.site-header--overlay,
+  .site-header.site-header--overlay.is-solid,
+  .site-header:not(.site-header--overlay) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .site-header .menu-toggle { display: grid; touch-action: manipulation; }
+  .site-header .menu-toggle,
+  .site-header .brand { position: relative; z-index: 2; }
+  .site-header.is-menu-open .brand__logo { filter: none; }
+
   .site-header--overlay:not(.is-solid) .site-header__navigation,
   .site-header--overlay.is-solid .site-header__navigation,
   .site-header:not(.site-header--overlay) .site-header__navigation {
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: 1;
     display: flex;
     overflow-y: auto;
     flex-direction: column;
     align-items: stretch;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 26px;
     padding: 96px 22px 40px;
     color: var(--color-warm-white);
     background: var(--color-black);
     transform: translateY(-102%);
+    visibility: hidden;
+    pointer-events: none;
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+    overscroll-behavior: contain;
     transition: transform .55s cubic-bezier(.7, 0, .2, 1);
   }
 
-  .site-header__navigation.is-open {
+  .site-header.is-menu-open .site-header__navigation.is-open {
     transform: none !important;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .site-header__navigation .nav-list {
+    display: grid;
     align-items: stretch;
   }
 
@@ -8628,6 +8648,7 @@ button.admin-professional-work-slot:focus-visible {
     text-transform: none;
   }
 
+  .site-header.is-menu-open .site-header__navigation .header-action.button--dark,
   .site-header__navigation .header-action.button,
   .site-header--overlay:not(.is-solid) .site-header__navigation .header-action.button {
     width: 100%;

@@ -7,6 +7,20 @@ export function Header() {
   const isHome = window.location.pathname === '/'
 
   useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1024px)')
+    const closeOnDesktop = () => { if (desktop.matches) setIsMenuOpen(false) }
+    desktop.addEventListener('change', closeOnDesktop)
+    return () => desktop.removeEventListener('change', closeOnDesktop)
+  }, [])
+
+  useEffect(() => {
+    if (!isMenuOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
+  }, [isMenuOpen])
+
+  useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setIsMenuOpen(false)
     }
@@ -37,7 +51,7 @@ export function Header() {
   const closeMenu = () => setIsMenuOpen(false)
 
   return (
-    <header className={`site-header ${isHome ? 'site-header--overlay' : ''} ${isScrolled || isMenuOpen ? 'is-solid' : ''}`}>
+    <header className={`site-header ${isHome ? 'site-header--overlay' : ''} ${isScrolled || isMenuOpen ? 'is-solid' : ''} ${isMenuOpen ? 'is-menu-open' : ''}`}>
       <div className="container site-header__inner">
         <a className="brand" href="/" aria-label="Marilyn Coiffure, inicio">
           <img
